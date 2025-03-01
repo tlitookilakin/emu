@@ -1,6 +1,10 @@
-﻿namespace EMU.Framework
+﻿using StardewValley;
+
+namespace EMU.Framework
 {
-	internal class Extensions
+	public static class Extensions
 	{
+		public static string GetId(this GameLocation where)
+			=> where is Farm ? "Farm_" + Game1.GetFarmTypeKey() : where.Name;
 	}
 }

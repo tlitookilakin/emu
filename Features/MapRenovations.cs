@@ -28,9 +28,12 @@ namespace EMU.Features
 
 		private static void ApplyRenovations(GameLocation __instance)
 		{
-			var name = __instance is Farm ? "Farm_" + Game1.GetFarmTypeKey() : __instance.Name;
+			var name = __instance.GetId();
 
-			if (!Assets.Renovations.TryGetValue(name, out var renovations))
+			if (!Assets.ExtendedData.TryGetValue(name, out var data))
+				return;
+
+			if (data.Renovations is not Dictionary<string, Renovation> renovations)
 				return;
 
 			foreach (var (id, renovation) in renovations)

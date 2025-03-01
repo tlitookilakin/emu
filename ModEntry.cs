@@ -8,7 +8,7 @@ namespace EMU
 {
 	public class ModEntry : Mod
 	{
-		public const string MOD_ID = "tlitoo.mumps";
+		public const string MOD_ID = "tlitoo.emu";
 
 		internal delegate void LocationChanged(GameLocation where, Farmer who);
 		internal static event LocationChanged? OnLocationChanged;

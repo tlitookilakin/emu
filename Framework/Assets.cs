@@ -7,16 +7,16 @@ namespace EMU.Framework
 	internal class Assets
 	{
 		const string SPRITE_DATA = MOD_ID + "/Sprites";
-		const string RENOVATION_DATA = MOD_ID + "/Renovations";
 		const string BACKGROUND_DATA = MOD_ID + "/Backgrounds";
+		const string EXTENDED_DATA = MOD_ID + "/ExtendedLocationData";
 
 		public static Dictionary<string, TemporarySpriteData> TempSprites
 			=> tempSprites ??= content.Load<Dictionary<string, TemporarySpriteData>>(SPRITE_DATA);
 		private static Dictionary<string, TemporarySpriteData>? tempSprites;
 
-		public static Dictionary<string, Dictionary<string, Renovation>> Renovations
-			=> renovations ??= content.Load<Dictionary<string, Dictionary<string, Renovation>>>(RENOVATION_DATA);
-		private static Dictionary<string, Dictionary<string, Renovation>>? renovations;
+		public static Dictionary<string, ExtendedLocationData> ExtendedData
+			=> extendedData ??= content.Load<Dictionary<string, ExtendedLocationData>>(EXTENDED_DATA);
+		private static Dictionary<string, ExtendedLocationData>? extendedData;
 
 		public static Dictionary<string, ParallaxData> Backgrounds
 			=> backgrounds ??= content.Load<Dictionary<string, ParallaxData>>(BACKGROUND_DATA);
@@ -56,8 +56,8 @@ namespace EMU.Framework
 			{
 				if (name.IsEquivalentTo(SPRITE_DATA))
 					tempSprites = null;
-				else if (name.IsEquivalentTo(RENOVATION_DATA))
-					renovations = null;
+				else if (name.IsEquivalentTo(EXTENDED_DATA))
+					extendedData = null;
 				else if (name.IsEquivalentTo(BACKGROUND_DATA))
 					backgrounds = null;
 			}
@@ -67,8 +67,8 @@ namespace EMU.Framework
 		{
 			if (e.NameWithoutLocale.IsEquivalentTo(SPRITE_DATA))
 				e.LoadFromModFile<Dictionary<string, TemporarySpriteData>>("assets/sprites.json", AssetLoadPriority.Low);
-			else if (e.NameWithoutLocale.IsEquivalentTo(RENOVATION_DATA))
-				e.LoadFrom(static () => new Dictionary<string, Dictionary<string, Renovation>>(), AssetLoadPriority.Low);
+			else if (e.NameWithoutLocale.IsEquivalentTo(EXTENDED_DATA))
+				e.LoadFrom(static () => new Dictionary<string, ExtendedLocationData>(), AssetLoadPriority.Low);
 			else if (e.NameWithoutLocale.IsEquivalentTo(BACKGROUND_DATA))
 				e.LoadFromModFile<Dictionary<string, ParallaxData>>("assets/backgrounds.json", AssetLoadPriority.Low);
 		}
