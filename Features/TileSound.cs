@@ -4,9 +4,9 @@ using StardewModdingAPI.Utilities;
 using StardewModdingAPI;
 using StardewValley;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
+using EMU.Framework;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class TileSound : IFeature
 	{
@@ -41,7 +41,7 @@ namespace MUMPs.Features
 			for (int i = 0; i < split.Length; i += 3)
 			{
 				if (
-					!ArgUtility.TryGetPoint(split, i, out var tile, out var error) || 
+					!ArgUtility.TryGetPoint(split, i, out var tile, out var error) ||
 					!ArgUtility.TryGet(split, i, out var s, out error, false)
 				)
 				{
@@ -53,7 +53,7 @@ namespace MUMPs.Features
 
 				if (!soundCache.TryGetValue(s, out var cue))
 				{
-					if(Game1.playSound(s, out cue))
+					if (Game1.playSound(s, out cue))
 						soundCache[s] = cue;
 					else
 						continue;

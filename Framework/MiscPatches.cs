@@ -2,7 +2,7 @@
 using StardewModdingAPI;
 using StardewValley;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	internal class MiscPatches : IPatch
 	{

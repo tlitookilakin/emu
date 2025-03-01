@@ -3,7 +3,7 @@ using StardewGenTools;
 using StardewModdingAPI;
 using System.Reflection;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	[Collector("Patchers")]
 	// Arrrrrr matey

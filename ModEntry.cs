@@ -1,10 +1,10 @@
-﻿using MUMPs.Framework;
+﻿using EMU.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
-namespace MUMPs
+namespace EMU
 {
 	public class ModEntry : Mod
 	{

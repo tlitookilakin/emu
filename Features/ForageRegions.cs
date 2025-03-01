@@ -1,13 +1,13 @@
-﻿using HarmonyLib;
+﻿using EMU.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Extensions;
 using StardewValley.GameData.Locations;
 using StardewValley.Internal;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class ForageRegions : IPatch
 	{
@@ -119,14 +119,14 @@ namespace MUMPs.Features
 					var tile = new Vector2(x, y);
 
 					if (
-						where.objects.ContainsKey(tile) || 
-						where.IsNoSpawnTile(tile) || 
-						where.doesEitherTileOrTileIndexPropertyEqual(x, y, "Spawnable", "Back", "F") || 
-						!where.CanItemBePlacedHere(tile) || 
-						where.getTileIndexAt(x, y, "AlwaysFront") != -1 || 
-						where.getTileIndexAt(x, y, "Front") != -1 || 
-						where.isBehindBush(tile) || 
-						(!r.NextBool(0.1) && where.isBehindTree(tile))
+						where.objects.ContainsKey(tile) ||
+						where.IsNoSpawnTile(tile) ||
+						where.doesEitherTileOrTileIndexPropertyEqual(x, y, "Spawnable", "Back", "F") ||
+						!where.CanItemBePlacedHere(tile) ||
+						where.getTileIndexAt(x, y, "AlwaysFront") != -1 ||
+						where.getTileIndexAt(x, y, "Front") != -1 ||
+						where.isBehindBush(tile) ||
+						!r.NextBool(0.1) && where.isBehindTree(tile)
 					)
 						continue;
 
@@ -136,7 +136,7 @@ namespace MUMPs.Features
 						continue;
 
 					Item forageItem = ItemQueryResolver.TryResolveRandomItem(
-						forage, itemQueryContext, avoidRepeat: false, null, null, null, (query, error) 
+						forage, itemQueryContext, avoidRepeat: false, null, null, null, (query, error)
 						=> Log($"Could not retrieve forage item '{query}' to spawn in region '{name}' in '{where.Name}': {error}", LogLevel.Warn)
 					);
 

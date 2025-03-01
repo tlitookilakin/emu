@@ -1,8 +1,8 @@
-﻿using MUMPs.Framework;
+﻿using EMU.Framework;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class IgnoreOutdoorLighting : IFeature
 	{
@@ -13,8 +13,8 @@ namespace MUMPs.Features
 
 		private void Update(GameLocation where, Farmer who)
 		{
-			where.ignoreOutdoorLighting.Value = 
-				where.ignoreOutdoorLighting.Value || 
+			where.ignoreOutdoorLighting.Value =
+				where.ignoreOutdoorLighting.Value ||
 				where.getMapProperty("IgnoreOutdoorLighting") is not null;
 		}
 	}

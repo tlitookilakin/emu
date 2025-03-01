@@ -1,12 +1,12 @@
-﻿using HarmonyLib;
-using MUMPs.Framework;
+﻿using EMU.Framework;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
 using System.Reflection.Emit;
 using xTile;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class UseSeasonalTiles : IPatch
 	{

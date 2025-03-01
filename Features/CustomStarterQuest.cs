@@ -1,11 +1,11 @@
 ﻿using HarmonyLib;
-using MUMPs.Framework;
+using EMU.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using System.Reflection.Emit;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class CustomStarterQuest : IPatch
 	{

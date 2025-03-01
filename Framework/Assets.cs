@@ -1,8 +1,8 @@
 ﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using static MUMPs.ModEntry;
+using static EMU.ModEntry;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	internal class Assets
 	{
@@ -24,9 +24,7 @@ namespace MUMPs.Framework
 
 		private static IFeature.Logger Log = ModUtilities.LogDefault;
 
-		# nullable disable
-		private static IGameContentHelper content;
-		# nullable enable
+		private static IGameContentHelper content = null!;
 
 		public static bool TryLoad<T>(string name, out T asset, bool showError = true) where T : notnull
 		{
@@ -39,7 +37,7 @@ namespace MUMPs.Framework
 			{
 				Log($"Failed to load asset '{name}': {ex}", showError ? LogLevel.Warn : LogLevel.Trace);
 			}
-			asset = default;
+			asset = default!;
 			return false;
 		}
 

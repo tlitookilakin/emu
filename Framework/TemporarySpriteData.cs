@@ -1,9 +1,9 @@
 ﻿using StardewValley.GameData;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	public class TemporarySpriteData : TemporaryAnimatedSpriteDefinition
 	{
-		public bool UseDepth {  get; set; }
+		public bool UseDepth { get; set; }
 	}
 }

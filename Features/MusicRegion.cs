@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using EMU.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -8,7 +8,7 @@ using StardewValley;
 using StardewValley.GameData;
 using System.Reflection;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	// TODO double-check overrides
 	// TODO add bgm injection
@@ -38,7 +38,7 @@ namespace MUMPs.Features
 					typeof(Game1)
 					.GetField("_instanceRequestedMusicTracks", IPatch.AnyDeclared | BindingFlags.Instance)
 					?.CreateFieldGetter<Game1, Dictionary<MusicContext, KeyValuePair<string, bool>>>();
-			} 
+			}
 			catch (Exception ex)
 			{
 				err = ex.Message;

@@ -1,10 +1,10 @@
-﻿using HarmonyLib;
-using MUMPs.Framework;
+﻿using EMU.Framework;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class BuildingSpawn : IPatch
 	{
@@ -34,7 +34,7 @@ namespace MUMPs.Features
 			if (data is null)
 				return;
 
-			if (data.CustomFields is Dictionary<string, string> fields && 
+			if (data.CustomFields is Dictionary<string, string> fields &&
 				fields.TryGetValue("MUMPS/DefaultBuildings", out var value))
 			{
 				var split = ArgUtility.SplitBySpaceQuoteAware(value);

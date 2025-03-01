@@ -1,4 +1,4 @@
-﻿namespace MUMPs
+﻿namespace EMU
 {
 	public class Config
 	{

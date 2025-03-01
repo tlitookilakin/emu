@@ -1,10 +1,10 @@
-﻿using HarmonyLib;
+﻿using EMU.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewValley;
-using static MUMPs.Framework.IFeature;
-namespace MUMPs.Features
+using static EMU.Framework.IFeature;
+namespace EMU.Features
 {
 	internal class Slope : IPatch
 	{

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	public class Renovation
 	{

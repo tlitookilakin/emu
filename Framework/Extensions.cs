@@ -1,4 +1,4 @@
-﻿namespace MUMPs.Framework
+﻿namespace EMU.Framework
 {
 	internal class Extensions
 	{

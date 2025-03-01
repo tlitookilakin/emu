@@ -1,11 +1,11 @@
-﻿using HarmonyLib;
+﻿using EMU.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using System.Globalization;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class WaterColor : IPatch
 	{
@@ -60,7 +60,7 @@ namespace MUMPs.Features
 					{
 						3 => new(uint.Parse($"{cstr[2]}{cstr[2]}{cstr[1]}{cstr[1]}{cstr[0]}{cstr[0]}", NumberStyles.HexNumber, null) | 0xFF000000),
 						4 => new(uint.Parse($"{cstr[3]}{cstr[3]}{cstr[2]}{cstr[2]}{cstr[1]}{cstr[1]}{cstr[0]}{cstr[0]}", NumberStyles.HexNumber, null)),
-						6 => new(((uint.Parse(cstr, NumberStyles.HexNumber, null) << 8) | 0xFF).Reverse()),
+						6 => new((uint.Parse(cstr, NumberStyles.HexNumber, null) << 8 | 0xFF).Reverse()),
 						8 => new(uint.Parse(cstr, NumberStyles.HexNumber, null).Reverse()),
 						_ => throw new FormatException(
 							$"'{split[0]}' is not a valid hexadecimal color code. (Must use one of these formats: #rgb #rgba #rrggbb #rrggbbaa)")

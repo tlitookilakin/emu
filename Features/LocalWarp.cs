@@ -1,9 +1,9 @@
-﻿using HarmonyLib;
-using MUMPs.Framework;
+﻿using EMU.Framework;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class LocalWarp : IPatch
 	{

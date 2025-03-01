@@ -1,10 +1,10 @@
-﻿using HarmonyLib;
+﻿using EMU.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class MapRenovations : IPatch
 	{

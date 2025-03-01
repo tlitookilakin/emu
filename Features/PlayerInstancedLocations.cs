@@ -1,12 +1,12 @@
-﻿using HarmonyLib;
-using MUMPs.Framework;
+﻿using EMU.Framework;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Locations;
 using StardewValley.Network;
 using System.Reflection;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class PlayerInstancedLocations : IPatch
 	{

@@ -1,14 +1,14 @@
-﻿using HarmonyLib;
+﻿using EMU.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
 using System.Reflection;
 using System.Reflection.Emit;
-using static MUMPs.ModEntry;
+using static EMU.ModEntry;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class CustomSteps : IPatch
 	{
@@ -89,7 +89,7 @@ namespace MUMPs.Features
 			var loc = who.currentLocation;
 
 			return
-				loc.doesTileHaveProperty(pos.X, pos.Y, PROP_SOUND, "Back") ?? 
+				loc.doesTileHaveProperty(pos.X, pos.Y, PROP_SOUND, "Back") ??
 				(UseWaterStep(loc, pos) ? "quickSlosh" : sprite.currentStep);
 		}
 

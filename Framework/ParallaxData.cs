@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Delegates;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	public class ParallaxData
 	{

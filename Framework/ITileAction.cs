@@ -2,7 +2,7 @@
 using StardewGenTools;
 using StardewValley;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	[Collector("Actions")]
 	internal partial interface ITileAction : IFeature

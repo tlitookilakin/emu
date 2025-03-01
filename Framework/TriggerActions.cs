@@ -4,7 +4,7 @@ using StardewValley.Triggers;
 using System.Reflection;
 using static StardewValley.GameStateQuery;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	public static class TriggerActions
 	{

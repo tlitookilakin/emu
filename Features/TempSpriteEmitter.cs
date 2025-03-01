@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using MUMPs.Framework;
+﻿using EMU.Framework;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -8,7 +8,7 @@ using StardewValley.Delegates;
 using StardewValley.Extensions;
 using System.Runtime.CompilerServices;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	// tile property on paths layer
 	// chance:float id:string pixel_region:rectangle +depth_offset:float +condition:string...

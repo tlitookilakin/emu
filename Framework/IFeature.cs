@@ -1,7 +1,7 @@
 ﻿using StardewGenTools;
 using StardewModdingAPI;
 
-namespace MUMPs.Framework
+namespace EMU.Framework
 {
 	[Collector("Features")]
 	internal partial interface IFeature

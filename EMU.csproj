@@ -4,16 +4,16 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<AssemblyName>MUMPs</AssemblyName>
+		<AssemblyName>ExtraMapUtilities</AssemblyName>
 		<EnableHarmony>true</EnableHarmony>
 		<LangVersion>Latest</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Name>MUMPs2</Name>
+		<Name>Extra Map Utilities</Name>
 		<Authors>tlitookilakin</Authors>
 		<Description>Adds many new utilities for map makers</Description>
-		<UniqueId>tlitoo.mumps</UniqueId>
+		<UniqueId>tlitoo.emu</UniqueId>
 		<Version>2.0.0</Version>
 		<MinimumApiVersion_Behavior>Update</MinimumApiVersion_Behavior>
 	</PropertyGroup>

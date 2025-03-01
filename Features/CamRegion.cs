@@ -1,11 +1,11 @@
-﻿using HarmonyLib;
+﻿using EMU.Framework;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class CamRegion : IPatch
 	{
@@ -53,16 +53,16 @@ namespace MUMPs.Features
 
 		private static void UpdateCamera(bool overrideFreeze, ref Point centerPoint)
 		{
-			if (Game1.currentLocation.forceViewportPlayerFollow || (!overrideFreeze && Game1.viewportFreeze))
+			if (Game1.currentLocation.forceViewportPlayerFollow || !overrideFreeze && Game1.viewportFreeze)
 				return;
 
 			Point tileCenter = new(centerPoint.X / 64, centerPoint.Y / 64);
 			foreach (var region in regions.Value)
 				if (region.Contains(tileCenter))
 				{
-					centerPoint.X = (Game1.viewport.Width >= region.Width) ? region.X + region.Width / 2 :
+					centerPoint.X = Game1.viewport.Width >= region.Width ? region.X + region.Width / 2 :
 						Math.Clamp(centerPoint.X, region.X + Game1.viewport.Width / 2, region.X + region.Width - Game1.viewport.Width / 2);
-					centerPoint.Y = (Game1.viewport.Height >= region.Height) ? region.Y + region.Height / 2 :
+					centerPoint.Y = Game1.viewport.Height >= region.Height ? region.Y + region.Height / 2 :
 						Math.Clamp(centerPoint.Y, region.Y + Game1.viewport.Height / 2, region.Y + region.Height - Game1.viewport.Height / 2);
 					break;
 				}

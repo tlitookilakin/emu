@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using MUMPs.Framework;
+using EMU.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -7,7 +7,7 @@ using StardewValley;
 using StardewValley.Mods;
 using xTile.Layers;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class LightingLayer : IPatch
 	{
@@ -29,7 +29,7 @@ namespace MUMPs.Features
 			layers.Clear();
 
 			var sort = new List<(Layer layer, int priority)>();
-			foreach(var layer in where.map.Layers)
+			foreach (var layer in where.map.Layers)
 			{
 				if (layer.Id.StartsWith("Lighting"))
 				{

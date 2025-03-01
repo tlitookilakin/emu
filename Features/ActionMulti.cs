@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using MUMPs.Framework;
+﻿using EMU.Framework;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class ActionMulti : ITileAction
 	{

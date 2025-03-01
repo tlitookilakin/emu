@@ -1,20 +1,20 @@
-﻿using Microsoft.Xna.Framework;
+﻿using EMU.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MUMPs.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Mods;
 using System.Diagnostics.CodeAnalysis;
-using RepeatStyle = MUMPs.Framework.ParallaxLayer.RepeatStyle;
+using RepeatStyle = EMU.Framework.ParallaxLayer.RepeatStyle;
 
-namespace MUMPs.Features
+namespace EMU.Features
 {
 	internal class Parallax : IFeature
 	{
-		private IModHelper Helper;
-		private IFeature.Logger Log;
+		private IModHelper Helper = null!;
+		private IFeature.Logger Log = null!;
 		private readonly PerScreen<ParallaxState?> Foreground = new();
 		private readonly PerScreen<ParallaxState?> Background = new();
 
@@ -117,13 +117,13 @@ namespace MUMPs.Features
 
 			if (layer.Repeat is RepeatStyle.TileH or RepeatStyle.TileBoth)
 			{
-				h_iters = (view.Width / dest.Width) + 1;
+				h_iters = view.Width / dest.Width + 1;
 				offset.X = (offset.X - view.X) % dest.Width;
 			}
 
 			if (layer.Repeat is RepeatStyle.TileV or RepeatStyle.TileBoth)
 			{
-				v_iters = (view.Height / dest.Height) + 1;
+				v_iters = view.Height / dest.Height + 1;
 				offset.Y = (offset.Y - view.Y) % dest.Height;
 			}
 
@@ -132,12 +132,12 @@ namespace MUMPs.Features
 					batch.Draw(
 						texture,
 						new Rectangle(offset.X + hi * dest.Height, offset.Y + vi * dest.Height, dest.Width, dest.Height),
-						layer.SourceRegion, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 
+						layer.SourceRegion, Color.White, 0f, Vector2.Zero, SpriteEffects.None,
 						front ? 1000f - layer.Depth : layer.Depth
 					);
 		}
 
-		private static bool TryGetBackground(GameLocation where, Farmer who, string property, 
+		private static bool TryGetBackground(GameLocation where, Farmer who, string property,
 			[NotNullWhen(true)] out ParallaxState? bg, [NotNullWhen(false)] out string? error)
 		{
 			bg = null;
