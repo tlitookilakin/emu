@@ -52,7 +52,7 @@ namespace EMU.Features
 			offset = 0;
 
 			var pt = __instance.TilePoint;
-			if (!float.TryParse(loc.doesTileHavePropertyNoNull(pt.X, pt.Y, "Slope", "Back"), out var off))
+			if (!float.TryParse(loc.doesTileHavePropertyNoNull(pt.X, pt.Y, "EMU_Slope", "Back"), out var off))
 				return bounds;
 
 			off *= __instance.GetBoundingBox().X - bounds.X;

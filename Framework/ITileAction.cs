@@ -20,10 +20,10 @@ namespace EMU.Framework
 				var action = Actions[i];
 
 				if (action.DoAction is Func<GameLocation, string[], Farmer, Point, bool> use)
-					GameLocation.RegisterTileAction(action.ID, use);
+					GameLocation.RegisterTileAction("EMU_" + action.ID, use);
 
 				if (action.DoTileAction is Action<GameLocation, string[], Farmer, Vector2> touch)
-					GameLocation.RegisterTouchAction(action.ID, touch);
+					GameLocation.RegisterTouchAction("EMU_" + action.ID, touch);
 			}
 		}
 	}

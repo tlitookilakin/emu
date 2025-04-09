@@ -22,7 +22,6 @@ namespace EMU
 		{
 			helper = Helper;
 			Helper.Events.GameLoop.GameLaunched += OnLaunch;
-			Helper.Events.GameLoop.UpdateTicking += OnTick;
 
 			config = Helper.ReadConfig<Config>();
 			I18n.Init(Helper.Translation);
@@ -43,6 +42,7 @@ namespace EMU
 
 		private void OnLaunch(object? sender, GameLaunchedEventArgs e)
 		{
+			Helper.Events.GameLoop.UpdateTicking += OnTick;
 			MiscPatches.OnMapUpdate = CheckMapRemodel;
 
 			IFeature.InitAll(Monitor.Log, Helper);

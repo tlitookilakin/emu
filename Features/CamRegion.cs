@@ -24,7 +24,7 @@ namespace EMU.Features
 		private void LoadLocation(GameLocation where, Farmer who)
 		{
 			regions.Value.Clear();
-			string[] split = where.GetMapPropertySplitBySpaces("CamRegion");
+			string[] split = where.GetMapPropertySplitBySpaces("EMU_CamRegion");
 
 			if (split.Length is 0)
 				return;

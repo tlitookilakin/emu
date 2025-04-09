@@ -7,7 +7,6 @@ namespace EMU.Framework
 	internal class Assets
 	{
 		const string SPRITE_DATA = MOD_ID + "/Sprites";
-		const string BACKGROUND_DATA = MOD_ID + "/Backgrounds";
 		const string EXTENDED_DATA = MOD_ID + "/ExtendedLocationData";
 
 		public static Dictionary<string, TemporarySpriteData> TempSprites
@@ -17,10 +16,6 @@ namespace EMU.Framework
 		public static Dictionary<string, ExtendedLocationData> ExtendedData
 			=> extendedData ??= content.Load<Dictionary<string, ExtendedLocationData>>(EXTENDED_DATA);
 		private static Dictionary<string, ExtendedLocationData>? extendedData;
-
-		public static Dictionary<string, ParallaxData> Backgrounds
-			=> backgrounds ??= content.Load<Dictionary<string, ParallaxData>>(BACKGROUND_DATA);
-		private static Dictionary<string, ParallaxData>? backgrounds;
 
 		private static IFeature.Logger Log = ModUtilities.LogDefault;
 
@@ -58,8 +53,6 @@ namespace EMU.Framework
 					tempSprites = null;
 				else if (name.IsEquivalentTo(EXTENDED_DATA))
 					extendedData = null;
-				else if (name.IsEquivalentTo(BACKGROUND_DATA))
-					backgrounds = null;
 			}
 		}
 
@@ -69,8 +62,6 @@ namespace EMU.Framework
 				e.LoadFromModFile<Dictionary<string, TemporarySpriteData>>("assets/sprites.json", AssetLoadPriority.Low);
 			else if (e.NameWithoutLocale.IsEquivalentTo(EXTENDED_DATA))
 				e.LoadFrom(static () => new Dictionary<string, ExtendedLocationData>(), AssetLoadPriority.Low);
-			else if (e.NameWithoutLocale.IsEquivalentTo(BACKGROUND_DATA))
-				e.LoadFromModFile<Dictionary<string, ParallaxData>>("assets/backgrounds.json", AssetLoadPriority.Low);
 		}
 	}
 }

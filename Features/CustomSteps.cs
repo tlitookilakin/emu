@@ -12,8 +12,8 @@ namespace EMU.Features
 {
 	internal class CustomSteps : IPatch
 	{
-		private const string PROP_SOUND = MOD_ID + "_StepSound";
-		private const string PROP_SPRITE = MOD_ID + "_StepSprite";
+		private const string PROP_SOUND = "EMU_StepSound";
+		private const string PROP_SPRITE = "EMU_StepSprite";
 
 		private static IFeature.Logger Log = ModUtilities.LogDefault;
 		private static readonly Color splashColor = new(141, 181, 216, 91);
@@ -103,7 +103,7 @@ namespace EMU.Features
 
 			string? str =
 				where.doesTileHaveProperty((int)pos.X / 64, (int)pos.Y / 64, PROP_SPRITE, "Back") ??
-				(what is "quickSlosh" ? "water_ripple water_splash" : null);
+				(what is "quickSlosh" ? "water_ripple" : null);
 
 			if (str is null)
 				return;

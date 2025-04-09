@@ -12,8 +12,8 @@ namespace EMU.Framework
 
 		internal static void RegisterActions()
 		{
-			foreach (var method in typeof(TriggerActions).GetMethods(BindingFlags.Static | BindingFlags.Public))
-				TriggerActionManager.RegisterAction($"MUMPS_{method.Name}", method.CreateDelegate<TriggerActionDelegate>());
+			foreach (var method in typeof(TriggerActions).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
+				TriggerActionManager.RegisterAction($"EMU_{method.Name}", method.CreateDelegate<TriggerActionDelegate>());
 		}
 
 		public static bool RefreshRenovations(string[] args, TriggerActionContext context, out string? error)

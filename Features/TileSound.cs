@@ -10,12 +10,12 @@ namespace EMU.Features
 {
 	internal class TileSound : IFeature
 	{
-		public const string PROPERTY_NAME = "MUMPS.MapSounds";
+		public const string PROPERTY_NAME = "EMU_TileSounds";
 
 		private static readonly PerScreen<Dictionary<ICue, List<Vector2>>> soundSources = new(() => new());
 		private static readonly PerScreen<float> fadeVolume = new(() => -.5f);
-		private IFeature.Logger Logger = null!;
-		private IModHelper Helper = null!;
+		private static IFeature.Logger Logger = null!;
+		private static IModHelper Helper = null!;
 
 		public void Init(IFeature.Logger log, IModHelper helper)
 		{
@@ -28,7 +28,7 @@ namespace EMU.Features
 			Helper.Events.GameLoop.UpdateTicking += Tick;
 		}
 
-		private void PopulateSounds(GameLocation where, Farmer who)
+		private static void PopulateSounds(GameLocation where, Farmer who)
 		{
 			var data = new Dictionary<ICue, List<Vector2>>();
 			var soundCache = new Dictionary<string, ICue>();
@@ -85,7 +85,8 @@ namespace EMU.Features
 		}
 		private static void Tick(object? sender, UpdateTickingEventArgs ev)
 		{
-			fadeVolume.Value = Math.Min(1f, fadeVolume.Value + (float)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds * .0003f);
+
+			//fadeVolume.Value = Math.Min(1f, fadeVolume.Value + (float)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds * .0003f);
 
 			var vol = Math.Min(Game1.ambientPlayerVolume, Game1.options.ambientVolumeLevel);
 			var pos = Game1.player.Position;

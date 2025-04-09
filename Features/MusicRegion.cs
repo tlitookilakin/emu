@@ -89,7 +89,7 @@ namespace EMU.Features
 
 			state.baseMusic = where.GetLocationSpecificMusic();
 
-			if (!where.TryGetMapProperty("MusicRegions", out var prop))
+			if (!where.TryGetMapProperty("EMU_MusicRegions", out var prop))
 				return;
 
 			var split = ArgUtility.SplitBySpaceQuoteAware(prop);

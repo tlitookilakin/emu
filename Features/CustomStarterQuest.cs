@@ -9,7 +9,7 @@ namespace EMU.Features
 {
 	internal class CustomStarterQuest : IPatch
 	{
-		public const string MAP_PROPERTY = ModEntry.MOD_ID + "_StarterQuest";
+		public const string MAP_PROPERTY = "EMU_StarterQuest";
 
 		public string Name => "Custom Starter Quest";
 

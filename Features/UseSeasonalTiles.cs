@@ -55,7 +55,7 @@ namespace EMU.Features
 
 		public static bool ForceSeasonalTiles(Map map)
 		{
-			return map.Properties.ContainsKey("UseSeasonalTiles");
+			return map.Properties.ContainsKey("EMU_UseSeasonalTiles");
 		}
 	}
 }

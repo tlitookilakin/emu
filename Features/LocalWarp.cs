@@ -28,7 +28,7 @@ namespace EMU.Features
 
 		private static void AddLocalWarps(GameLocation __instance)
 		{
-			if (!__instance.TryGetMapProperty("LocalWarps", out var prop))
+			if (!__instance.TryGetMapProperty("EMU_LocalWarps", out var prop))
 				return;
 
 			var split = ArgUtility.SplitBySpace(prop);

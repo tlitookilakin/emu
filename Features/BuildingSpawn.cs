@@ -35,7 +35,7 @@ namespace EMU.Features
 				return;
 
 			if (data.CustomFields is Dictionary<string, string> fields &&
-				fields.TryGetValue("MUMPS/DefaultBuildings", out var value))
+				fields.TryGetValue("EMU_DefaultBuildings", out var value))
 			{
 				var split = ArgUtility.SplitBySpaceQuoteAware(value);
 

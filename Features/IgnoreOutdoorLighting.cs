@@ -13,9 +13,7 @@ namespace EMU.Features
 
 		private void Update(GameLocation where, Farmer who)
 		{
-			where.ignoreOutdoorLighting.Value =
-				where.ignoreOutdoorLighting.Value ||
-				where.getMapProperty("IgnoreOutdoorLighting") is not null;
+			where.ignoreOutdoorLighting.Value |= where.getMapProperty("EMU_IgnoreOutdoorLighting") is not null;
 		}
 	}
 }

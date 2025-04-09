@@ -6,13 +6,5 @@
 		"Frames": 9,
 		"UseDepth": false,
 		"Color": "#8DB5D85B"
-	},
-	"water_splash" : {
-		"Texture": "Tilesheets\\animations",
-		"SourceRect": {"X": 128, "Y": 1152, "Width": 64, "Height": 64},
-		"Interval": 100,
-		"Frames": 5,
-		"SpriteOffset": {"X": 0, "Y": -8},
-		"Color": "#8DB5D85B"
 	}
 }

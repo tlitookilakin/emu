@@ -14,7 +14,7 @@ namespace EMU.Features
 	// chance:float id:string pixel_region:rectangle +depth_offset:float +condition:string...
 	internal class TempSpriteEmitter : IFeature
 	{
-		const string PROPERTY_NAME = ModEntry.MOD_ID + "_Emitter";
+		const string PROPERTY_NAME = "EMU_Emitter";
 
 		private sealed record class Emitter(TemporarySpriteData Sprite, Point Tile, Rectangle Region, string Condition, float chance, float offset);
 

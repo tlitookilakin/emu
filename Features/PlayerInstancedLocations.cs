@@ -10,7 +10,7 @@ namespace EMU.Features
 {
 	internal class PlayerInstancedLocations : IPatch
 	{
-		const string FLAG = ModEntry.MOD_ID + "_PlayerInstanced";
+		const string FLAG = "EMU_PlayerInstanced";
 
 		public string Name => "Instanced Locations";
 
