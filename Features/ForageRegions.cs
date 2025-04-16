@@ -7,8 +7,6 @@ using StardewValley.Delegates;
 using StardewValley.Extensions;
 using StardewValley.GameData.Locations;
 using StardewValley.Internal;
-using System;
-using System.Xml.Linq;
 
 namespace EMU.Features
 {

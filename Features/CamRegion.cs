@@ -2,14 +2,14 @@
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
 using StardewValley;
 
 namespace EMU.Features
 {
 	internal class CamRegion : IPatch
 	{
-		private static readonly PerScreen<List<Rectangle>> regions = new(() => new());
+		private static readonly PropertyCache<List<Rectangle>> regions =
+			new("EMU_CamRegion", ParseRegions);
 		private static IFeature.Logger Log = ModUtilities.LogDefault;
 
 		public string Name => "Camera Regions";
@@ -17,28 +17,27 @@ namespace EMU.Features
 		public void Init(IFeature.Logger log, IModHelper helper)
 		{
 			Log = log;
-
-			ModEntry.OnLocationChanged += LoadLocation;
 		}
 
-		private void LoadLocation(GameLocation where, Farmer who)
+		private static List<Rectangle> ParseRegions(GameLocation where, string? prop)
 		{
-			regions.Value.Clear();
-			string[] split = where.GetMapPropertySplitBySpaces("EMU_CamRegion");
+			if (prop is null)
+				return [];
 
-			if (split.Length is 0)
-				return;
+			var regions = new List<Rectangle>();
+			var split = ArgUtility.SplitBySpace(prop);
 
-			for (int i = 0; i + 3 < split.Length; i += 4)
+			for (int i = 0; i < split.Length; i += 4)
 			{
 				if (!ArgUtility.TryGetRectangle(split, i, out Rectangle rect, out var error))
 				{
 					Log($"Failed to parse CamRegion map property for {where.DisplayName}:\n{error}", LogLevel.Warn);
-					regions.Value.Clear();
-					return;
+					return [];
 				}
-				regions.Value.Add(rect);
+				regions.Add(rect);
 			}
+
+			return regions;
 		}
 
 		public void Patch(Harmony harmony, out string? Error)
@@ -57,7 +56,7 @@ namespace EMU.Features
 				return;
 
 			Point tileCenter = new(centerPoint.X / 64, centerPoint.Y / 64);
-			foreach (var region in regions.Value)
+			foreach (var region in regions.Get(Game1.currentLocation))
 				if (region.Contains(tileCenter))
 				{
 					centerPoint.X = Game1.viewport.Width >= region.Width ? region.X + region.Width / 2 :
