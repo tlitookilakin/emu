@@ -15,10 +15,8 @@ namespace EMU.Framework
 
 		public string Name { get; }
 
-		public static void PatchAll(string id, Logger Log)
+		public static void PatchAll(Harmony harmony, Logger Log)
 		{
-			var harmony = new Harmony(id);
-
 			Log("Beginning patches...", LogLevel.Info);
 
 			for (int i = 0; i < PatcherCount; i++)

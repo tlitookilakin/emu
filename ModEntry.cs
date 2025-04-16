@@ -1,4 +1,5 @@
 ﻿using EMU.Framework;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -45,9 +46,12 @@ namespace EMU
 			Helper.Events.GameLoop.UpdateTicking += OnTick;
 			MiscPatches.OnMapUpdate = CheckMapRemodel;
 
+			var harmony = new Harmony(ModManifest.UniqueID);
+
 			IFeature.InitAll(Monitor.Log, Helper);
-			IPatch.PatchAll(ModManifest.UniqueID, Monitor.Log);
+			IPatch.PatchAll(harmony, Monitor.Log);
 			ITileAction.RegisterAll(Monitor.Log);
+			TileCache.Init(harmony, helper!);
 
 			TriggerActions.RegisterActions();
 		}
