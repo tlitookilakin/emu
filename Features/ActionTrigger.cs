@@ -1,43 +1,30 @@
-﻿using EMU.Framework;
+﻿using EMU.Framework.Attributes;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Triggers;
 
-namespace EMU.Features
+namespace EMU.Features;
+
+[Feature("Tile Trigger")]
+internal class ActionTrigger(IMonitor Monitor)
 {
-	internal class ActionTrigger : ITileAction
+
+	[TileAction("Trigger")]
+	public bool TileTrigger(GameLocation where, string[] args, Farmer who, Point tile)
 	{
-		private static IFeature.Logger Log = null!;
-
-		public string ID => "Trigger";
-
-		public Func<GameLocation, string[], Farmer, Point, bool>? DoAction
-			=> TileTrigger;
-
-		public Action<GameLocation, string[], Farmer, Vector2>? DoTileAction 
-			=> null;
-
-		public void Init(IFeature.Logger log, IModHelper helper)
+		if (args.Length is 1)
 		{
-			Log = log;
+			Monitor.Log("Could not trigger action, no action specified.", LogLevel.Warn); 
+			return false;
 		}
 
-		private static bool TileTrigger(GameLocation where, string[] args, Farmer who, Point tile)
+		if(!TriggerActionManager.TryRunAction(string.Join(' ', args[2..]), out var err, out _))
 		{
-			if (args.Length is 1)
-			{
-				Log("Could not trigger action, no action specified.", LogLevel.Warn); 
-				return false;
-			}
-
-			if(!TriggerActionManager.TryRunAction(string.Join(' ', args[2..]), out var err, out _))
-			{
-				Log(err, LogLevel.Warn);
-				return false;
-			}
-
-			return true;
+			Monitor.Log(err, LogLevel.Warn);
+			return false;
 		}
+
+		return true;
 	}
 }

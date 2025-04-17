@@ -1,4 +1,4 @@
-﻿using EMU.Framework;
+﻿using EMU.Framework.Attributes;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
@@ -6,56 +6,49 @@ using StardewValley.Locations;
 using System.Reflection.Emit;
 using xTile;
 
-namespace EMU.Features
+namespace EMU.Features;
+
+[Feature("Seasonal Tiles")]
+internal class UseSeasonalTiles
 {
-	internal class UseSeasonalTiles : IPatch
+	private static IMonitor Monitor = null!;
+
+	public UseSeasonalTiles(IMonitor monitor, Harmony harmony)
 	{
-		public string Name => "Use Seasonal Tiles";
+		Monitor = monitor;
 
-		private static IFeature.Logger Log = ModUtilities.LogDefault;
+		harmony.Patch(
+			typeof(GameLocation).GetMethod(nameof(GameLocation.updateSeasonalTileSheets)),
+			transpiler: new(typeof(UseSeasonalTiles), nameof(SkipCheck))
+		);
+	}
 
-		public void Init(IFeature.Logger log, IModHelper helper)
+	private static IEnumerable<CodeInstruction>? SkipCheck(IEnumerable<CodeInstruction> codes, ILGenerator gen)
+	{
+		var il = new CodeMatcher(codes, gen);
+
+		il.MatchStartForward(
+			new(OpCodes.Ldarg_0),
+			new(OpCodes.Isinst, typeof(Summit))
+		);
+
+		if (il.IsInvalid)
 		{
-			Log = log;
+			Monitor.Log("Failed to apply seasonal tiles: 1st anchor not found.", LogLevel.Error);
+			return null;
 		}
 
-		public void Patch(Harmony harmony, out string? Error)
-		{
-			Error = null;
+		il.InsertAndAdvance(
+			new(OpCodes.Ldarg_1),
+			new(OpCodes.Call, typeof(UseSeasonalTiles).GetMethod(nameof(ForceSeasonalTiles))),
+			new(OpCodes.Brtrue_S, il.InstructionAt(2).operand)
+		);
 
-			harmony.Patch(
-				typeof(GameLocation).GetMethod(nameof(GameLocation.updateSeasonalTileSheets)),
-				transpiler: new(typeof(UseSeasonalTiles), nameof(SkipCheck))
-			);
-		}
+		return il.InstructionEnumeration();
+	}
 
-		private static IEnumerable<CodeInstruction>? SkipCheck(IEnumerable<CodeInstruction> codes, ILGenerator gen)
-		{
-			var il = new CodeMatcher(codes, gen);
-
-			il.MatchStartForward(
-				new(OpCodes.Ldarg_0),
-				new(OpCodes.Isinst, typeof(Summit))
-			);
-
-			if (il.IsInvalid)
-			{
-				Log("Failed to apply seasonal tiles: 1st anchor not found.", LogLevel.Error);
-				return null;
-			}
-
-			il.InsertAndAdvance(
-				new(OpCodes.Ldarg_1),
-				new(OpCodes.Call, typeof(UseSeasonalTiles).GetMethod(nameof(ForceSeasonalTiles))),
-				new(OpCodes.Brtrue_S, il.InstructionAt(2).operand)
-			);
-
-			return il.InstructionEnumeration();
-		}
-
-		public static bool ForceSeasonalTiles(Map map)
-		{
-			return map.Properties.ContainsKey("EMU_UseSeasonalTiles");
-		}
+	public static bool ForceSeasonalTiles(Map map)
+	{
+		return map.Properties.ContainsKey("EMU_UseSeasonalTiles");
 	}
 }

@@ -1,59 +1,57 @@
-﻿using EMU.Framework;
+﻿using EMU.Data;
+using EMU.Framework;
+using EMU.Framework.Attributes;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace EMU.Features
+namespace EMU.Features;
+
+[Feature("Map Renovations")]
+internal class MapRenovations
 {
-	internal class MapRenovations : IPatch
+	private static IMonitor Monitor = null!;
+	private static Assets Assets = null!;
+
+	public MapRenovations(IMonitor monitor, Harmony harmony, Assets assets)
 	{
-		public string Name => "Map Renovations";
+		Monitor = monitor;
+		Assets = assets;
 
-		private static IFeature.Logger Log = ModUtilities.LogDefault;
+		harmony.Patch(
+			typeof(GameLocation).GetMethod(nameof(GameLocation.MakeMapModifications)),
+			postfix: new(typeof(MapRenovations), nameof(ApplyRenovations))
+		);
+	}
 
-		public void Init(IFeature.Logger log, IModHelper helper)
+	private static void ApplyRenovations(GameLocation __instance)
+	{
+		var name = __instance.GetId();
+
+		if (!Assets.ExtendedData.TryGetValue(name, out var data))
+			return;
+
+		if (data.Renovations is not Dictionary<string, Renovation> renovations)
+			return;
+
+		foreach (var (id, renovation) in renovations)
 		{
-			Log = log;
-		}
+			if (renovation.Condition is string query && !GameStateQuery.CheckConditions(query, __instance))
+				continue;
 
-		public void Patch(Harmony harmony, out string? Error)
-		{
-			Error = null;
-			harmony.Patch(
-				typeof(GameLocation).GetMethod(nameof(GameLocation.MakeMapModifications)),
-				postfix: new(typeof(MapRenovations), nameof(ApplyRenovations))
-			);
-		}
+			var destRect =
+				!renovation.SourceRegion.HasValue ? null :
+				!renovation.Destination.HasValue ? renovation.SourceRegion :
+				new Rectangle(renovation.Destination.Value, renovation.SourceRegion.Value.Size);
 
-		private static void ApplyRenovations(GameLocation __instance)
-		{
-			var name = __instance.GetId();
-
-			if (!Assets.ExtendedData.TryGetValue(name, out var data))
-				return;
-
-			if (data.Renovations is not Dictionary<string, Renovation> renovations)
-				return;
-
-			foreach (var (id, renovation) in renovations)
+			try
 			{
-				if (renovation.Condition is string query && !GameStateQuery.CheckConditions(query, __instance))
-					continue;
-
-				var destRect =
-					!renovation.SourceRegion.HasValue ? null :
-					!renovation.Destination.HasValue ? renovation.SourceRegion :
-					new Rectangle(renovation.Destination.Value, renovation.SourceRegion.Value.Size);
-
-				try
-				{
-					__instance.ApplyMapOverride(renovation.SourceMap, id, renovation.SourceRegion, destRect);
-				}
-				catch (Exception ex)
-				{
-					Log($"Error applying renovation '{id}' in location '{name}': {ex}", LogLevel.Warn);
-				}
+				__instance.ApplyMapOverride(renovation.SourceMap, id, renovation.SourceRegion, destRect);
+			}
+			catch (Exception ex)
+			{
+				Monitor.Log($"Error applying renovation '{id}' in location '{name}': {ex}", LogLevel.Warn);
 			}
 		}
 	}

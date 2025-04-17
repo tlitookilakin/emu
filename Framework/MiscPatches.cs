@@ -1,41 +1,26 @@
-﻿using HarmonyLib;
-using StardewModdingAPI;
+﻿using EMU.Framework.Attributes;
+using HarmonyLib;
 using StardewValley;
 
-namespace EMU.Framework
+namespace EMU.Framework;
+
+[Feature("Misc Patches")]
+internal class MiscPatches
 {
-	internal class MiscPatches : IPatch
+	private static Config cfg = null!;
+
+	public MiscPatches(Harmony harmony, Config config)
 	{
-		public string Name => "Misc Patches";
-		public static Action<GameLocation> OnMapUpdate = g => { };
+		cfg = config;
 
-		public void Init(IFeature.Logger log, IModHelper helper)
-		{
-		}
+		harmony.Patch(
+			typeof(Options).GetProperty(nameof(Options.lightingQuality))!.GetMethod,
+			postfix: new(typeof(MiscPatches), nameof(UpgradeLighting))
+		);
+	}
 
-		public void Patch(Harmony harmony, out string? Error)
-		{
-			Error = null;
-
-			harmony.Patch(
-				typeof(GameLocation).GetMethod(nameof(GameLocation.SortLayers)),
-				postfix: new(typeof(MiscPatches), nameof(RefreshLayers))
-			);
-
-			harmony.Patch(
-				typeof(Options).GetProperty(nameof(Options.lightingQuality))!.GetMethod,
-				postfix: new(typeof(MiscPatches), nameof(UpgradeLighting))
-			);
-		}
-
-		private static void RefreshLayers(GameLocation __instance)
-		{
-			OnMapUpdate(__instance);
-		}
-
-		private static int UpgradeLighting(int original)
-		{
-			return ModEntry.config.HighQualityLighting ? 2 : original;
-		}
+	private static int UpgradeLighting(int original)
+	{
+		return cfg.HighQualityLighting ? 2 : original;
 	}
 }

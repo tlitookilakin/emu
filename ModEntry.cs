@@ -14,19 +14,35 @@ namespace EMU
 		internal delegate void LocationChanged(GameLocation where, Farmer who);
 		internal static event LocationChanged? OnLocationChanged;
 		internal static event Action<Farmer>? OnCleanup;
-		internal static Config config = new();
-		internal static IModHelper? helper;
 
 		private static readonly PerScreen<GameLocation> lastLocation = new();
 
 		public override void Entry(IModHelper helper)
 		{
-			helper = Helper;
+			RegisterProviders();
 			Helper.Events.GameLoop.GameLaunched += OnLaunch;
+		}
 
-			config = Helper.ReadConfig<Config>();
-			I18n.Init(Helper.Translation);
-			Assets.Init(Helper, Monitor.Log);
+		private void RegisterProviders()
+		{
+			var harmony = new Harmony(ModManifest.UniqueID);
+
+			Core.Provide(Monitor);
+			Core.Provide(Helper);
+			Core.Provide(ModManifest);
+			Core.Provide(new Assets(Helper, Monitor));
+			Core.Provide(harmony);
+			Core.Provide(Helper.ReadConfig<Config>());
+			Core.Provide<IPropertyCacheProvider>(new PropertyCacheProvider());
+			Core.Provide<ITileCacheProvider>(new TileCacheProvider(harmony, Helper));
+		}
+
+		private void OnLaunch(object? sender, GameLaunchedEventArgs e)
+		{
+			Monitor.Log("Initializing...", LogLevel.Info);
+			Helper.Events.GameLoop.UpdateTicking += OnTick;
+			Core.Init(Monitor);
+			Monitor.Log("Fully initialized.", LogLevel.Info);
 		}
 
 		private void OnTick(object? sender, UpdateTickingEventArgs e)
@@ -39,27 +55,6 @@ namespace EMU
 				else
 					OnCleanup?.Invoke(Game1.player);
 			}
-		}
-
-		private void OnLaunch(object? sender, GameLaunchedEventArgs e)
-		{
-			Helper.Events.GameLoop.UpdateTicking += OnTick;
-			MiscPatches.OnMapUpdate = CheckMapRemodel;
-
-			var harmony = new Harmony(ModManifest.UniqueID);
-
-			IFeature.InitAll(Monitor.Log, Helper);
-			IPatch.PatchAll(harmony, Monitor.Log);
-			ITileAction.RegisterAll(Monitor.Log);
-			TileCache.Init(harmony, helper!);
-
-			TriggerActions.RegisterActions();
-		}
-
-		private static void CheckMapRemodel(GameLocation where)
-		{
-			if (Game1.currentLocation == where)
-				OnLocationChanged?.Invoke(where, Game1.player);
 		}
 	}
 }

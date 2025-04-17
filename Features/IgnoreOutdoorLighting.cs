@@ -1,19 +1,19 @@
-﻿using EMU.Framework;
+﻿using EMU.Framework.Attributes;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace EMU.Features
-{
-	internal class IgnoreOutdoorLighting : IFeature
-	{
-		public void Init(IFeature.Logger log, IModHelper helper)
-		{
-			ModEntry.OnLocationChanged += Update;
-		}
+namespace EMU.Features;
 
-		private void Update(GameLocation where, Farmer who)
-		{
-			where.ignoreOutdoorLighting.Value |= where.getMapProperty("EMU_IgnoreOutdoorLighting") is not null;
-		}
+[Feature("Ignore Outdoor Lighting")]
+internal class IgnoreOutdoorLighting
+{
+	public IgnoreOutdoorLighting(IModHelper helper)
+	{
+		ModEntry.OnLocationChanged += Update;
+	}
+
+	private void Update(GameLocation where, Farmer who)
+	{
+		where.ignoreOutdoorLighting.Value |= where.getMapProperty("EMU_IgnoreOutdoorLighting") is not null;
 	}
 }

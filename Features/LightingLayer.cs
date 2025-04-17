@@ -1,5 +1,5 @@
-﻿using HarmonyLib;
-using EMU.Framework;
+﻿using EMU.Framework.Attributes;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -7,68 +7,65 @@ using StardewValley;
 using StardewValley.Mods;
 using xTile.Layers;
 
-namespace EMU.Features
+namespace EMU.Features;
+
+[Feature("Lighting Layer")]
+internal class LightingLayer
 {
-	internal class LightingLayer : IPatch
+	private static readonly PerScreen<List<Layer>> lightingLayers = new(() => new());
+	private const int tileScale = Game1.tileSize / 16;
+
+	public LightingLayer(IModHelper helper)
 	{
-		private static readonly PerScreen<List<Layer>> lightingLayers = new(() => new());
-		private const int tileScale = Game1.tileSize / 16;
+		helper.Events.Display.RenderingStep += OnRendering;
+		ModEntry.OnLocationChanged += ChangeLocation;
+	}
 
-		public string Name => "Lighting Layer";
+	private void ChangeLocation(GameLocation where, Farmer who)
+	{
+		var layers = lightingLayers.Value;
+		layers.Clear();
 
-		public void Init(IFeature.Logger log, IModHelper helper)
+		var sort = new List<(Layer layer, int priority)>();
+		foreach (var layer in where.map.Layers)
 		{
-			helper.Events.Display.RenderingStep += OnRendering;
-
-			ModEntry.OnLocationChanged += ChangeLocation;
-		}
-
-		private void ChangeLocation(GameLocation where, Farmer who)
-		{
-			var layers = lightingLayers.Value;
-			layers.Clear();
-
-			var sort = new List<(Layer layer, int priority)>();
-			foreach (var layer in where.map.Layers)
+			if (layer.Id.StartsWith("Lighting"))
 			{
-				if (layer.Id.StartsWith("Lighting"))
+				int sortIndex = 0;
+				string sortString = layer.Id[8..];
+				if (sortString.Length <= 0 || int.TryParse(sortString, out sortIndex))
 				{
-					int sortIndex = 0;
-					string sortString = layer.Id[8..];
-					if (sortString.Length <= 0 || int.TryParse(sortString, out sortIndex))
-					{
-						sort.Add((layer, sortIndex));
-						break;
-					}
-				}
-			}
-			sort.Sort((a, b) => a.priority.CompareTo(b.priority));
-			layers.AddRange(sort.Select(i => i.layer));
-		}
-
-		private void OnRendering(object? sender, RenderingStepEventArgs e)
-		{
-			if (e.Step is RenderSteps.World_DrawLightmapOnScreen)
-			{
-				int quality = Game1.options.lightingQuality / 2;
-
-				if (quality <= tileScale)
-				{
-					int scale = tileScale / quality;
-					var bounds = Game1.lightmap.Bounds;
-					var lightingPort = new xTile.Dimensions.Rectangle(Game1.viewport.Location, new(bounds.Width, bounds.Height));
-					var layers = lightingLayers.Value;
-
-					for (int i = 0; i < layers.Count; i++)
-						layers[i].Draw(Game1.mapDisplayDevice, lightingPort, xTile.Dimensions.Location.Origin, false, scale, i * .0001f + .05f);
+					sort.Add((layer, sortIndex));
+					break;
 				}
 			}
 		}
+		sort.Sort((a, b) => a.priority.CompareTo(b.priority));
+		layers.AddRange(sort.Select(i => i.layer));
+	}
 
-		public void Patch(Harmony harmony, out string? Error)
+	private void OnRendering(object? sender, RenderingStepEventArgs e)
+	{
+		if (e.Step is RenderSteps.World_DrawLightmapOnScreen)
 		{
-			Error = null;
-			// TODO: patch updateOther
+			int quality = Game1.options.lightingQuality / 2;
+
+			if (quality <= tileScale)
+			{
+				int scale = tileScale / quality;
+				var bounds = Game1.lightmap.Bounds;
+				var lightingPort = new xTile.Dimensions.Rectangle(Game1.viewport.Location, new(bounds.Width, bounds.Height));
+				var layers = lightingLayers.Value;
+
+				for (int i = 0; i < layers.Count; i++)
+					layers[i].Draw(Game1.mapDisplayDevice, lightingPort, xTile.Dimensions.Location.Origin, false, scale, i * .0001f + .05f);
+			}
 		}
+	}
+
+	public void Patch(Harmony harmony, out string? Error)
+	{
+		Error = null;
+		// TODO: patch updateOther
 	}
 }

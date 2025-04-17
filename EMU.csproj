@@ -19,14 +19,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="i18n\default.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Leclair.Stardew.ModManifestBuilder" Version="2.1.0" />
 		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-		<PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
-		<ProjectReference Include="..\StardewGenTools\StardewGenTools.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 </Project>
