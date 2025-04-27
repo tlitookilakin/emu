@@ -47,4 +47,11 @@ public static class ModUtilities
 		}
 		return sb.ToString();
 	}
+
+	public static double Distance(this Point a, Point b)
+	{
+		int x = Math.Abs(a.X - b.X);
+		int y = Math.Abs(a.Y - b.Y);
+		return Math.Sqrt(x * x + y * y);
+	}
 }

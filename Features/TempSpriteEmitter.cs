@@ -23,15 +23,15 @@ internal class TempSpriteEmitter
 		public bool Enabled { get; set; } = true;
 	}
 
-	private TileCache<Emitter?> EmitterCache;
-	private Assets Assets;
-	private IMonitor Monitor;
+	private readonly TileCache<Emitter?> EmitterCache;
+	private readonly Assets Assets;
+	private readonly IMonitor Monitor;
 
-	public TempSpriteEmitter(IModHelper helper, ITileCacheProvider tileCache, Assets assets, IMonitor monitor)
+	public TempSpriteEmitter(IModHelper helper, ICacheProvider tileCache, Assets assets, IMonitor monitor)
 	{
 		Assets = assets;
 		Monitor = monitor;
-		EmitterCache = tileCache.Create(PROPERTY_NAME, "Paths", ReadFromTile);
+		EmitterCache = tileCache.CreateTileCache(PROPERTY_NAME, "Paths", ReadFromTile);
 
 		ModEntry.OnLocationChanged += LocationChanged;
 		helper.Events.GameLoop.TimeChanged += TimeChanged;

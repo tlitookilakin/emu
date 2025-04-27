@@ -1,5 +1,4 @@
-﻿using EMU.Framework;
-using EMU.Framework.Attributes;
+﻿using EMU.Framework.Attributes;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewValley;

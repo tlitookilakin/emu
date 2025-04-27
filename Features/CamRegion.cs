@@ -13,10 +13,10 @@ internal class CamRegion
 	private static PropertyCache<List<Rectangle>> regions = null!;
 	private readonly IMonitor Monitor;
 
-	public CamRegion(IMonitor monitor, Harmony harmony, IPropertyCacheProvider propCache)
+	public CamRegion(IMonitor monitor, Harmony harmony, ICacheProvider propCache)
 	{
 		Monitor = monitor;
-		regions = propCache.Create("EMU_CamRegion", ParseRegions);
+		regions = propCache.CreatePropertyCache("EMU_CamRegion", ParseRegions);
 
 		harmony.Patch(
 			typeof(Game1).GetMethod(nameof(Game1.UpdateViewPort)),

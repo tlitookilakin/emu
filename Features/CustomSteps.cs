@@ -19,7 +19,7 @@ internal class CustomSteps
 	private static IMonitor Monitor = null!;
 	private static Assets Assets = null!;
 
-	public void Patch(Harmony harmony, IMonitor monitor, Assets assets)
+	public CustomSteps(Harmony harmony, IMonitor monitor, Assets assets)
 	{
 		Monitor = monitor;
 		Assets = assets;

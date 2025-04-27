@@ -9,7 +9,6 @@ namespace EMU.Features;
 [Feature("Tile Trigger")]
 internal class ActionTrigger(IMonitor Monitor)
 {
-
 	[TileAction("Trigger")]
 	public bool TileTrigger(GameLocation where, string[] args, Farmer who, Point tile)
 	{

@@ -17,31 +17,51 @@ internal static class Core
 		Providers[typeof(T)] = dependency;
 	}
 
-	internal static void Init(IMonitor monitor)
+	internal static void ProvideWith<T>(Type? type = null) where T : class
 	{
+		if (type == null)
+			type = typeof(T);
+
+		else if (!type.IsAssignableTo(typeof(T)))
+			return;
+
+		IMonitor monitor = (IMonitor)Providers[typeof(IMonitor)];
+
+		if (TryConstruct(type, type.Name, monitor, out var inst))
+			Providers[typeof(T)] = inst;
+	}
+
+	internal static void Init()
+	{
+		IMonitor monitor = (IMonitor)Providers[typeof(IMonitor)];
+
 		var types = typeof(Core).Assembly.GetTypes();
 		foreach (var type in types)
 		{
 			if (type.GetCustomAttribute<FeatureAttribute>() is not FeatureAttribute attr)
 				continue;
 
-			var name = attr.Name;
-
-			if (!TryInitialize(type, out var inst, out var err))
-			{
-				monitor.Log($"Could not initialize feature '{name}':\n{err}", LogLevel.Error);
-				continue;
-			}
-
-			if (!TryRegisterActions(type, inst, out err))
-			{
-				monitor.Log($"Could not register tile action(s) for feature '{name}':\n{err}", LogLevel.Error);
-				continue;
-			}
-
-			features.Add(new(name, inst));
-			monitor.Log($"Initialized feature '{name}'.", LogLevel.Trace);
+			if (TryConstruct(type, attr.Name, monitor, out var inst))
+				features.Add(new(attr.Name, inst));
 		}
+	}
+
+	private static bool TryConstruct(Type type, string name, IMonitor monitor, [NotNullWhen(true)] out object? result)
+	{
+		if (!TryInitialize(type, out result, out var err))
+		{
+			monitor.Log($"Could not initialize feature '{name}':\n{err}", LogLevel.Error);
+			return false;
+		}
+
+		if (!TryRegisterActions(type, result, out err))
+		{
+			monitor.Log($"Could not register tile action(s) for feature '{name}':\n{err}", LogLevel.Error);
+			return false;
+		}
+
+		monitor.Log($"Initialized feature '{name}'.", LogLevel.Trace);
+		return true;
 	}
 
 	private static bool TryRegisterActions(Type type, object instance, [NotNullWhen(false)] out string? error)

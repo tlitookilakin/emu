@@ -1,6 +1,5 @@
 ﻿using EMU.Framework.Attributes;
 using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 using StardewValley;
 
 namespace EMU.Features;

@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework.Audio;
-using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
+﻿using StardewModdingAPI.Events;
 using StardewModdingAPI;
 using StardewValley;
-using Microsoft.Xna.Framework;
 using EMU.Framework.Attributes;
 using EMU.Framework;
+using StardewModdingAPI.Utilities;
+using HarmonyLib;
+using StardewValley.BellsAndWhistles;
 
 namespace EMU.Features;
 
@@ -14,105 +14,78 @@ internal class TileSound
 {
 	public const string PROPERTY_NAME = "EMU_TileSound";
 
-	private static readonly PerScreen<Dictionary<ICue, List<Vector2>>> soundSources = new(() => new());
-	private static readonly PerScreen<float> fadeVolume = new(() => -.5f);
-	private IMonitor Monitor;
-	private IModHelper Helper;
-	private TileCache<string> SoundPoints;
+	private static readonly Dictionary<string, ICue> cues = [];
+	private readonly IModHelper Helper;
+	private readonly TileCache<string> SoundPoints;
+	private static readonly PerScreen<float> LocationFade = new();
+	private float updateTimer;
 
-	// TODO rewrite with tilecache
-	public TileSound(IMonitor monitor, IModHelper helper, ITileCacheProvider tileCache)
+	public TileSound(IModHelper helper, ICacheProvider tileCache, Harmony harmony)
 	{
 		Helper = helper;
-		Monitor = monitor;
-		SoundPoints = tileCache.Create(PROPERTY_NAME, "Paths", static (g, p, s) => s);
+		SoundPoints = tileCache.CreateTileCache(PROPERTY_NAME, "Paths", static (g, p, s) => s);
 
-		ModEntry.OnLocationChanged += PopulateSounds;
-		ModEntry.OnCleanup += Cleanup;
-		Helper.Events.Multiplayer.PeerDisconnected += CheckSplitScreenStop;
 		Helper.Events.GameLoop.UpdateTicking += Tick;
+
+		harmony.Patch(
+			typeof(AmbientLocationSounds).GetMethod(nameof(AmbientLocationSounds.onLocationLeave)),
+			postfix: new(typeof(TileSound), nameof(StartFade))
+		);
 	}
 
-	private void PopulateSounds(GameLocation where, Farmer who)
+	private static void StartFade()
 	{
-		var data = new Dictionary<ICue, List<Vector2>>();
-		var soundCache = new Dictionary<string, ICue>();
-		soundSources.Value = data;
-
-		if (!where.TryGetMapProperty(PROPERTY_NAME, out var prop))
-			return;
-
-		var split = ArgUtility.SplitBySpaceQuoteAware(prop);
-		for (int i = 0; i < split.Length; i += 3)
-		{
-			if (
-				!ArgUtility.TryGetPoint(split, i, out var tile, out var error) ||
-				!ArgUtility.TryGet(split, i, out var s, out error, false)
-			)
-			{
-				Monitor.Log($"Could not read {PROPERTY_NAME} for location {where.NameOrUniqueName}:\n{error}", LogLevel.Warn);
-				return;
-			}
-
-			s = s.Trim();
-
-			if (!soundCache.TryGetValue(s, out var cue))
-			{
-				if (Game1.playSound(s, out cue))
-					soundCache[s] = cue;
-				else
-					continue;
-			}
-
-			var points = data.TryGetValue(cue, out var p) ? p : data[cue] = [];
-			points.Add(new(tile.X * 64f, tile.Y * 64f));
-			cue.Volume = 0f;
-		}
+		LocationFade.Value = -.5f;
 	}
-	private void CheckSplitScreenStop(object? _, PeerDisconnectedEventArgs ev)
-	{
-		if (ev.Peer.IsSplitScreen)
-			StopAll(soundSources.GetValueForScreen(ev.Peer.ScreenID ?? 0));
-	}
-	private void StopAll(Dictionary<ICue, List<Vector2>>? which = null)
-	{
-		which ??= soundSources.Value;
-		foreach (var cue in which.Keys)
-		{
-			cue.Stop(AudioStopOptions.Immediate);
-		}
-		which.Clear();
-	}
-	private void Cleanup(Farmer who)
-	{
-		fadeVolume.Value = -.5f;
-		StopAll();
-	}
+
 	private void Tick(object? sender, UpdateTickingEventArgs ev)
 	{
-		//fadeVolume.Value = Math.Min(1f, fadeVolume.Value + (float)Game1.currentGameTime.ElapsedGameTime.TotalMilliseconds * .0003f);
+		var elapsed = Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+		updateTimer -= elapsed;
 
-		var vol = Math.Min(Game1.ambientPlayerVolume, Game1.options.ambientVolumeLevel);
-		var pos = Game1.player.Position;
+		var fade = LocationFade.Value = Math.Min(1f, LocationFade.Value + elapsed * .0003f);
 
-		foreach ((var cue, var points) in soundSources.Value)
+		if (updateTimer > 0)
+			return;
+
+		//var vol = Math.Min(Game1.ambientPlayerVolume, Game1.options.ambientVolumeLevel);
+		var pos = Game1.player.TilePoint;
+		var volumes = new Dictionary<string, int>();
+		
+		foreach ((var tile, var name) in SoundPoints.GetAll(Game1.currentLocation))
 		{
-			float nearest = float.PositiveInfinity;
-			foreach (var point in points)
-				nearest = MathF.Min(nearest, Vector2.Distance(point, pos));
+			int d = (int)(pos.Distance(tile) * 64.0);
 
-			if (nearest > 1536)
-			{
-				cue.Pause();
+			if (!volumes.TryGetValue(name, out int dist) || d > dist)
+				volumes[name] = d;
+		}
+
+		foreach ((var name, var dist) in volumes)
+		{
+			if (dist > 1536)
 				continue;
+
+			if (!cues.TryGetValue(name, out var cue))
+			{
+				if (!Game1.soundBank.Exists(name))
+					continue;
+
+				cues[name] = cue = Game1.soundBank.GetCue(name);
 			}
 
-			nearest = MathF.Min(1f - nearest / 1536, fadeVolume.Value);
-			cue.Volume = MathF.Pow(nearest, 5f) * vol * 100f;
-			if (cue.IsPaused)
-				cue.Resume();
-			else if (!cue.IsPlaying)
-				cue.Play();
+			cue.Volume = MathF.Min(fade, 1f - dist / 1536f);
+		}
+
+		List<string> toRemove = [];
+
+		foreach (var name in cues.Keys)
+			if (!volumes.ContainsKey(name))
+				toRemove.Add(name);
+
+		foreach (var remove in toRemove)
+		{
+			cues[remove].Dispose();
+			cues.Remove(remove);
 		}
 	}
 }

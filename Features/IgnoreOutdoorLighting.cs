@@ -1,5 +1,4 @@
 ﻿using EMU.Framework.Attributes;
-using StardewModdingAPI;
 using StardewValley;
 
 namespace EMU.Features;
@@ -7,7 +6,7 @@ namespace EMU.Features;
 [Feature("Ignore Outdoor Lighting")]
 internal class IgnoreOutdoorLighting
 {
-	public IgnoreOutdoorLighting(IModHelper helper)
+	public IgnoreOutdoorLighting()
 	{
 		ModEntry.OnLocationChanged += Update;
 	}
