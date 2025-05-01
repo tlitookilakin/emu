@@ -1,6 +1,8 @@
 ﻿using EMU.Data;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.Objects;
 using System.Reflection;
 using System.Text;
 
@@ -53,5 +55,19 @@ public static class ModUtilities
 		int x = Math.Abs(a.X - b.X);
 		int y = Math.Abs(a.Y - b.Y);
 		return Math.Sqrt(x * x + y * y);
+	}
+
+	public static Rectangle GetPropertyBox(this Furniture furn)
+	{
+		// tiles or pixels?
+		var bounds = furn.boundingBox.Value;
+		var radius = furn.GetAdditionalTilePropertyRadius();
+		return new(bounds.X / 64 - radius, bounds.Y / 64 - radius, bounds.Width / 64 + radius * 2, bounds.Height / 64 + radius * 2);
+	}
+
+	public static Rectangle GetPropertyBox(this Building build)
+	{
+		var radius = build.GetAdditionalTilePropertyRadius();
+		return new(build.tileX.Value - radius, build.tileY.Value - radius, build.tilesWide.Value + radius * 2, build.tilesHigh.Value + radius * 2);
 	}
 }

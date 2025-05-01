@@ -3,8 +3,11 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.Objects;
 using System.Runtime.CompilerServices;
 using xTile;
+using xTile.Tiles;
 
 namespace EMU.Framework;
 
@@ -21,7 +24,10 @@ public abstract class TileCache
 		Layer = layer;
 	}
 
+	public abstract void UpdateAll(GameLocation where, Rectangle region = default);
 	public abstract void UpdateBlock(GameLocation where, Rectangle region = default);
+	public abstract void UpdateFurniture(GameLocation where, IEnumerable<Furniture>? furniture = null);
+	public abstract void UpdateBuildings(GameLocation where, IEnumerable<Building>? buildings = null);
 
 	public abstract void Clear(GameLocation where);
 
@@ -48,24 +54,29 @@ public abstract class TileCache
 	private static void BuildingsChanged(object? sender, BuildingListChangedEventArgs e)
 	{
 		var loc = e.Location;
-		foreach (var b in e.Added.Concat(e.Removed))
+		foreach (var b in e.Removed)
 		{
-			var rad = b.GetAdditionalTilePropertyRadius();
-			Rectangle bounds = new(b.tileX.Value - rad, b.tileY.Value - rad, b.tilesWide.Value + rad * 2, b.tilesHigh.Value + rad * 2);
+			Rectangle bounds = b.GetPropertyBox();
 			foreach (var cache in caches)
 				cache.UpdateBlock(loc, bounds);
 		}
+
+		foreach (var cache in caches)
+			cache.UpdateBuildings(loc, e.Added);
 	}
 
 	private static void FurnitureChanged(object? sender, FurnitureListChangedEventArgs e)
 	{
 		var loc = e.Location;
-		foreach (var f in e.Added.Concat(e.Removed))
+		foreach (var f in e.Removed)
 		{
-			Rectangle bounds = new(f.TileLocation.ToPoint(), new Point(f.getTilesWide(), f.getTilesHigh()));
+			var bounds = f.GetPropertyBox();
 			foreach (var cache in caches)
 				cache.UpdateBlock(loc, bounds);
 		}
+
+		foreach (var cache in caches)
+			cache.UpdateFurniture(loc, e.Added);
 	}
 
 	private static void InvalidateMap(object? sender, AssetsInvalidatedEventArgs e)
@@ -131,8 +142,44 @@ public class TileCache<T> : TileCache
 
 		Dictionary<Point, T> vals = [];
 		cache.Add(where, vals);
-		UpdateImpl(where, vals);
+
+		UpdateBlockImpl(where, vals);
+		UpdateBuildingsImpl(where, vals, where.buildings);
+		UpdateFurnitureImpl(where, vals, where.furniture);
+
 		return vals;
+	}
+
+	public override void UpdateAll(GameLocation where, Rectangle region = default)
+	{
+		// only update existing instances, to enforce lazy loading
+		if (!cache.TryGetValue(where, out var data))
+			return;
+
+		UpdateBlockImpl(where, data);
+		UpdateBuildingsImpl(where, data, where.buildings);
+		UpdateFurnitureImpl(where, data, where.furniture);
+		OnChanged?.Invoke(where);
+	}
+
+	public override void UpdateFurniture(GameLocation where, IEnumerable<Furniture>? furniture = null)
+	{
+		// only update existing instances, to enforce lazy loading
+		if (!cache.TryGetValue(where, out var data))
+			return;
+
+		UpdateFurnitureImpl(where, data, where.furniture);
+		OnChanged?.Invoke(where);
+	}
+
+	public override void UpdateBuildings(GameLocation where, IEnumerable<Building>? buildings = null)
+	{
+		// only update existing instances, to enforce lazy loading
+		if (!cache.TryGetValue(where, out var data))
+			return;
+
+		UpdateBuildingsImpl(where, data, where.buildings);
+		OnChanged?.Invoke(where);
 	}
 
 	public override void UpdateBlock(GameLocation where, Rectangle region = default)
@@ -141,41 +188,97 @@ public class TileCache<T> : TileCache
 		if (!cache.TryGetValue(where, out var data))
 			return;
 
-		UpdateImpl(where, data, region);
+		UpdateBlockImpl(where, data, region);
+		OnChanged?.Invoke(where);
 	}
 
-	private void UpdateImpl(GameLocation where, Dictionary<Point, T> data, Rectangle region = default)
+	private void UpdateBuildingsImpl(GameLocation where, Dictionary<Point, T> data, IEnumerable<Building> buildings)
+	{
+
+		var prop = PropertyName;
+		var layer = Layer;
+		string val = "";
+
+		foreach (var build in buildings)
+		{
+			var bounds = build.GetPropertyBox();
+
+			for (int x = bounds.Left; x < bounds.Right; x++)
+			{
+				for (int y = bounds.Top; y < bounds.Bottom; y++)
+				{
+					if (build.doesTileHaveProperty(x, y, prop, layer, ref val))
+					{
+						Point pos = new(x, y);
+						data.Add(pos, Factory(where, pos, val));
+					}
+				}
+			}
+		}
+	}
+
+	private void UpdateFurnitureImpl(GameLocation where, Dictionary<Point, T> data, IEnumerable<Furniture> furniture)
+	{
+		var prop = PropertyName;
+		var layer = Layer;
+		string val = "";
+
+		foreach (var furn in furniture)
+		{
+			var bounds = furn.GetPropertyBox();
+
+			for (int x = bounds.Left; x < bounds.Right; x++)
+			{
+				for (int y = bounds.Top; y < bounds.Bottom; y++)
+				{
+					if (furn.DoesTileHaveProperty(x, y, prop, layer, ref val)) 
+					{
+						Point pos = new(x, y);
+						data.Add(pos, Factory(where, pos, val));
+					}
+				}
+			}
+		}
+	}
+
+	private void UpdateBlockImpl(GameLocation where, Dictionary<Point, T> data, Rectangle region = default)
 	{
 		bool isFullMap = false;
+		var l = where.Map.GetLayer(Layer);
+		if (l is null)
+			return;
+
 		if (region.Equals(default))
 		{
-			var l = where.Map.GetLayer(Layer);
-			if (l is null)
-			{
-				data.Clear();
-				return;
-			}
-
 			data.Clear();
 			isFullMap = true;
 			region = new(0, 0, l.LayerWidth, l.LayerHeight);
 		}
+		else if (region.Width is 0 && region.Height is 0)
+		{
+			return;
+		}
+
+		var prop = PropertyName;
 
 		for (int x = region.X; x < region.Right; x++)
 		{
 			for (int y = region.Y; y < region.Bottom; y++)
 			{
-				Point tile = new(x, y);
+				Point pos = new(x, y);
 
-				if (where.doesTileHaveProperty(x, y, PropertyName, Layer) is string s)
-					data.Add(tile, Factory(where, tile, s));
-
+				if (l.Tiles[x, y] is Tile tile)
+				{
+					if (tile.Properties.TryGetValue(prop, out var val) || tile.TileIndexProperties.TryGetValue(prop, out val))
+					{
+						data.Add(pos, Factory(where, pos, (string)val));
+					}
+				}
 				else if (!isFullMap)
-					data.Remove(tile);
+				{
+					data.Remove(pos);
+				}
 			}
 		}
-
-		if (region.Width > 0 && region.Height > 0)
-			OnChanged?.Invoke(where);
 	}
 }

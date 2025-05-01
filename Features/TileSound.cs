@@ -40,6 +40,9 @@ internal class TileSound
 
 	private void Tick(object? sender, UpdateTickingEventArgs ev)
 	{
+		if (ev.Ticks is 0)
+			return;
+
 		var elapsed = Game1.currentGameTime.ElapsedGameTime.Milliseconds;
 		updateTimer -= elapsed;
 
