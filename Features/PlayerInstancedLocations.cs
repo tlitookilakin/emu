@@ -2,6 +2,7 @@
 using HarmonyLib;
 using StardewValley;
 using StardewValley.GameData.Locations;
+using StardewValley.Locations;
 using StardewValley.Network;
 using System.Reflection;
 
@@ -69,19 +70,44 @@ internal class PlayerInstancedLocations
 	{
 		if (IsInstanced(__0))
 		{
-			var suffix = GetInstanceIndex();
-			if (suffix is not 0)
+			int suffix;
+			var where = Game1.currentLocation;
+			if (where is FarmHouse house)
+			{
+				suffix = GetInstanceIndex(house.owner);
+			}
+			else if (where is Cellar || IsInstanced(where.GetData()))
+			{
+				__0 += FindNumberSuffix(where.NameOrUniqueName);
+				return;
+			}
+			else
+			{
+				suffix = GetInstanceIndex();
+			}
+
+			if (suffix is not 0 or 1)
 				__0 += suffix;
 		}
 	}
 
-	private static int GetInstanceIndex()
+	private static string FindNumberSuffix(string name)
 	{
-		long id = Game1.player.UniqueMultiplayerID;
+		for (int i = 0; i < name.Length; i++)
+			if (name[i] is >= '0' and <= '9')
+				return name[i..];
 
-		foreach (int i in Game1.player.team.cellarAssignments.Keys)
-			if (Game1.player.team.cellarAssignments[i] == id)
-				return i;
+		return "";
+	}
+
+	private static int GetInstanceIndex(Farmer? who = null)
+	{
+		who ??= Game1.player;
+		long id = who.UniqueMultiplayerID;
+
+		foreach ((var k, var v) in who.team.cellarAssignments.Pairs)
+			if (v == id)
+				return k;
 
 		return 0;
 	}
