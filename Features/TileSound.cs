@@ -20,17 +20,15 @@ internal class TileSound
 	private static readonly PerScreen<float> LocationFade = new();
 	private float updateTimer;
 
-	public TileSound(IModHelper helper, ICacheProvider tileCache, Harmony harmony)
+	public TileSound(IModHelper helper, ICacheProvider tileCache, Harmony harmony, IMonitor monitor)
 	{
 		Helper = helper;
 		SoundPoints = tileCache.CreateTileCache(PROPERTY_NAME, "Paths", static (g, p, s) => s);
 
 		Helper.Events.GameLoop.UpdateTicking += Tick;
 
-		harmony.Patch(
-			typeof(AmbientLocationSounds).GetMethod(nameof(AmbientLocationSounds.onLocationLeave)),
-			postfix: new(typeof(TileSound), nameof(StartFade))
-		);
+		harmony.Patcher(monitor)
+			.With<AmbientLocationSounds>(nameof(AmbientLocationSounds.onLocationLeave)).Postfix(StartFade);
 	}
 
 	private static void StartFade()

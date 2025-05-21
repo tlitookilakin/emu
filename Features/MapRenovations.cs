@@ -19,10 +19,8 @@ internal class MapRenovations
 		Monitor = monitor;
 		Assets = assets;
 
-		harmony.Patch(
-			typeof(GameLocation).GetMethod(nameof(GameLocation.MakeMapModifications)),
-			postfix: new(typeof(MapRenovations), nameof(ApplyRenovations))
-		);
+		harmony.Patcher(monitor)
+			.With<GameLocation>(nameof(GameLocation.MakeMapModifications)).Postfix(ApplyRenovations);
 	}
 
 	private static void ApplyRenovations(GameLocation __instance)

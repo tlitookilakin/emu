@@ -23,10 +23,8 @@ internal class ForageRegions
 		Assets = assets;
 		Monitor = monitor;
 
-		harmony.Patch(
-			typeof(GameLocation).GetMethod(nameof(GameLocation.spawnObjects)),
-			postfix: new(typeof(ForageRegions), nameof(SpawnRegions))
-		);
+		harmony.Patcher(monitor)
+			.With<GameLocation>(nameof(GameLocation.spawnObjects)).Postfix(SpawnRegions);
 	}
 
 	private static void SpawnRegions(GameLocation __instance)

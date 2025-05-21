@@ -1,6 +1,8 @@
-﻿using EMU.Framework.Attributes;
+﻿using EMU.Framework;
+using EMU.Framework.Attributes;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
 
 namespace EMU.Features;
@@ -11,22 +13,12 @@ internal class Slope
 	private static int offset;
 	private static float oldX;
 
-	public Slope(Harmony harmony)
+	public Slope(Harmony harmony, IMonitor monitor)
 	{
-		var positionMod = new HarmonyMethod(typeof(Slope), nameof(DoCheck));
-
-		harmony.Patch(
-			typeof(Farmer).GetMethod(nameof(Farmer.nextPosition)),
-			postfix: positionMod
-		);
-		harmony.Patch(
-			typeof(Farmer).GetMethod(nameof(Farmer.nextPositionHalf)),
-			postfix: positionMod
-		);
-		harmony.Patch(
-			typeof(Farmer).GetMethod(nameof(Farmer.MovePosition)),
-			postfix: new(typeof(Slope), nameof(ApplyModifier))
-		);
+		harmony.Patcher<Farmer>(monitor)
+			.With(nameof(Farmer.nextPosition)).Postfix(DoCheck)
+			.With(nameof(Farmer.nextPositionHalf)).Postfix(DoCheck)
+			.With(nameof(Farmer.MovePosition)).Postfix(ApplyModifier);
 	}
 
 	private static void ApplyModifier(Farmer __instance)

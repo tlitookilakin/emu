@@ -18,10 +18,8 @@ internal class CamRegion
 		Monitor = monitor;
 		regions = propCache.CreatePropertyCache("EMU_CamRegion", ParseRegions);
 
-		harmony.Patch(
-			typeof(Game1).GetMethod(nameof(Game1.UpdateViewPort)),
-			prefix: new(typeof(CamRegion), nameof(UpdateCamera))
-		);
+		harmony.Patcher(monitor)
+			.With<Game1>(nameof(Game1.UpdateViewPort)).Prefix(UpdateCamera);
 	}
 
 	private List<Rectangle> ParseRegions(GameLocation where, string? prop)

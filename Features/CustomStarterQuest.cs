@@ -1,5 +1,7 @@
-﻿using EMU.Framework.Attributes;
+﻿using EMU.Framework;
+using EMU.Framework.Attributes;
 using HarmonyLib;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using System.Reflection.Emit;
@@ -11,12 +13,10 @@ internal class CustomStarterQuest
 {
 	public const string MAP_PROPERTY = "EMU_StarterQuest";
 
-	public CustomStarterQuest(Harmony harmony)
+	public CustomStarterQuest(Harmony harmony, IMonitor monitor)
 	{
-		harmony.Patch(
-			typeof(Chest).GetMethod(nameof(Chest.dumpContents)),
-			transpiler: new(typeof(CustomStarterQuest), nameof(InjectReplacement))
-		);
+		harmony.Patcher(monitor)
+			.With<Chest>(nameof(Chest.dumpContents)).Transpiler(InjectReplacement);
 	}
 
 	private static IEnumerable<CodeInstruction> InjectReplacement(IEnumerable<CodeInstruction> source, ILGenerator gen)

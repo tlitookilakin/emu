@@ -1,6 +1,8 @@
-﻿using EMU.Framework.Attributes;
+﻿using EMU.Framework;
+using EMU.Framework.Attributes;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
 
 namespace EMU.Features;
@@ -8,17 +10,11 @@ namespace EMU.Features;
 [Feature("Water Color")]
 internal class WaterColor
 {
-	public WaterColor(Harmony harmony)
+	public WaterColor(Harmony harmony, IMonitor monitor)
 	{
-		harmony.Patch(
-			typeof(GameLocation).GetMethod(nameof(GameLocation.seasonUpdate)),
-			postfix: new(typeof(WaterColor), nameof(AdjustWaterColor))
-		);
-
-		harmony.Patch(
-			typeof(GameLocation).GetMethod(nameof(GameLocation.loadMap)),
-			postfix: new(typeof(WaterColor), nameof(AdjustWaterColor))
-		);
+		harmony.Patcher<GameLocation>(monitor)
+			.With(nameof(GameLocation.seasonUpdate)).Postfix(AdjustWaterColor)
+			.With(nameof(GameLocation.loadMap)).Postfix(AdjustWaterColor);
 	}
 
 	/// <summary>

@@ -25,10 +25,8 @@ internal class MusicRegion
 		Monitor = monitor;
 		Regions = propCache.CreatePropertyCache("EMU_MusicRegions", ParseRegions);
 
-		harmony.Patch(
-			typeof(GameLocation).GetMethod(nameof(GameLocation.HandleMusicChange)),
-			transpiler: new(typeof(MusicRegion), nameof(InsertLocationMusicShift))
-		);
+		harmony.Patcher(monitor)
+			.With<GameLocation>(nameof(GameLocation.HandleMusicChange)).Transpiler(InsertLocationMusicShift);
 	}
 
 	public void Update()

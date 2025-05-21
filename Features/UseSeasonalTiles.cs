@@ -1,4 +1,5 @@
-﻿using EMU.Framework.Attributes;
+﻿using EMU.Framework;
+using EMU.Framework.Attributes;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
@@ -17,10 +18,8 @@ internal class UseSeasonalTiles
 	{
 		Monitor = monitor;
 
-		harmony.Patch(
-			typeof(GameLocation).GetMethod(nameof(GameLocation.updateSeasonalTileSheets)),
-			transpiler: new(typeof(UseSeasonalTiles), nameof(SkipCheck))
-		);
+		harmony.Patcher(monitor)
+			.With<GameLocation>(nameof(GameLocation.updateSeasonalTileSheets)).Transpiler(SkipCheck);
 	}
 
 	private static IEnumerable<CodeInstruction>? SkipCheck(IEnumerable<CodeInstruction> codes, ILGenerator gen)
