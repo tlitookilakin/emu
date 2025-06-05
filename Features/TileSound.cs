@@ -4,7 +4,6 @@ using StardewValley;
 using EMU.Framework.Attributes;
 using EMU.Framework;
 using StardewModdingAPI.Utilities;
-using HarmonyLib;
 using StardewValley.BellsAndWhistles;
 
 namespace EMU.Features;
@@ -20,14 +19,14 @@ internal class TileSound
 	private static readonly PerScreen<float> LocationFade = new();
 	private float updateTimer;
 
-	public TileSound(IModHelper helper, ICacheProvider tileCache, Harmony harmony, IMonitor monitor)
+	public TileSound(IModHelper helper, ICacheProvider tileCache, HarmonyHelper harmony)
 	{
 		Helper = helper;
 		SoundPoints = tileCache.CreateTileCache(PROPERTY_NAME, "Paths", static (g, p, s) => s);
 
 		Helper.Events.GameLoop.UpdateTicking += Tick;
 
-		harmony.Patcher(monitor)
+		harmony
 			.With<AmbientLocationSounds>(nameof(AmbientLocationSounds.onLocationLeave)).Postfix(StartFade);
 	}
 
@@ -38,7 +37,7 @@ internal class TileSound
 
 	private void Tick(object? sender, UpdateTickingEventArgs ev)
 	{
-		if (ev.Ticks is 0)
+		if (ev.Ticks is 0 || Game1.currentLocation is null)
 			return;
 
 		var elapsed = Game1.currentGameTime.ElapsedGameTime.Milliseconds;

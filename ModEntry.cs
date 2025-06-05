@@ -30,6 +30,7 @@ public class ModEntry : Mod
 		Core.Provide(ModManifest);
 		Core.Provide(new Harmony(ModManifest.UniqueID));
 		Core.Provide(Helper.ReadConfig<Config>());
+		Core.ProvideWith<HarmonyHelper>();
 		Core.ProvideWith<Assets>();
 		Core.ProvideWith<ICacheProvider>(typeof(CacheProvider));
 	}

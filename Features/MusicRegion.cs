@@ -20,12 +20,12 @@ internal class MusicRegion
 	private readonly PerScreen<string?> PrevTrack = new();
 	private readonly IMonitor Monitor;
 
-	public MusicRegion(ICacheProvider propCache, Harmony harmony, IMonitor monitor)
+	public MusicRegion(ICacheProvider propCache, HarmonyHelper harmony, IMonitor monitor)
 	{
 		Monitor = monitor;
 		Regions = propCache.CreatePropertyCache("EMU_MusicRegions", ParseRegions);
 
-		harmony.Patcher(monitor)
+		harmony
 			.With<GameLocation>(nameof(GameLocation.HandleMusicChange)).Transpiler(InsertLocationMusicShift);
 	}
 

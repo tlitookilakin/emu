@@ -70,4 +70,11 @@ public static class ModUtilities
 		var radius = build.GetAdditionalTilePropertyRadius();
 		return new(build.tileX.Value - radius, build.tileY.Value - radius, build.tilesWide.Value + radius * 2, build.tilesHigh.Value + radius * 2);
 	}
+
+	public static TO? FirstOfType<TO, TI>(this IEnumerable<TI> items) 
+		where TO : class, TI
+		where TI : class
+	{
+		return items.FirstOrDefault(static i => i is TO) as TO;
+	}
 }

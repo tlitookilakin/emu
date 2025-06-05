@@ -14,12 +14,12 @@ internal class MapRenovations
 	private static IMonitor Monitor = null!;
 	private static Assets Assets = null!;
 
-	public MapRenovations(IMonitor monitor, Harmony harmony, Assets assets)
+	public MapRenovations(IMonitor monitor, HarmonyHelper harmony, Assets assets)
 	{
 		Monitor = monitor;
 		Assets = assets;
 
-		harmony.Patcher(monitor)
+		harmony
 			.With<GameLocation>(nameof(GameLocation.MakeMapModifications)).Postfix(ApplyRenovations);
 	}
 

@@ -13,10 +13,10 @@ internal class Slope
 	private static int offset;
 	private static float oldX;
 
-	public Slope(Harmony harmony, IMonitor monitor)
+	public Slope(HarmonyHelper harmony)
 	{
-		harmony.Patcher<Farmer>(monitor)
-			.With(nameof(Farmer.nextPosition)).Postfix(DoCheck)
+		harmony
+			.With<Farmer>(nameof(Farmer.nextPosition)).Postfix(DoCheck)
 			.With(nameof(Farmer.nextPositionHalf)).Postfix(DoCheck)
 			.With(nameof(Farmer.MovePosition)).Postfix(ApplyModifier);
 	}

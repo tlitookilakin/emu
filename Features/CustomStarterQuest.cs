@@ -13,9 +13,9 @@ internal class CustomStarterQuest
 {
 	public const string MAP_PROPERTY = "EMU_StarterQuest";
 
-	public CustomStarterQuest(Harmony harmony, IMonitor monitor)
+	public CustomStarterQuest(HarmonyHelper harmony)
 	{
-		harmony.Patcher(monitor)
+		harmony
 			.With<Chest>(nameof(Chest.dumpContents)).Transpiler(InjectReplacement);
 	}
 

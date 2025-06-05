@@ -18,12 +18,12 @@ internal class ForageRegions
 	private static Assets Assets = null!;
 	private static IMonitor Monitor = null!;
 
-	public ForageRegions(Harmony harmony, Assets assets, IMonitor monitor)
+	public ForageRegions(HarmonyHelper harmony, Assets assets, IMonitor monitor)
 	{
 		Assets = assets;
 		Monitor = monitor;
 
-		harmony.Patcher(monitor)
+		harmony
 			.With<GameLocation>(nameof(GameLocation.spawnObjects)).Postfix(SpawnRegions);
 	}
 

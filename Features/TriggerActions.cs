@@ -1,4 +1,5 @@
-﻿using EMU.Framework.Attributes;
+﻿using EMU.Framework;
+using EMU.Framework.Attributes;
 using StardewValley;
 using StardewValley.Delegates;
 using StardewValley.Triggers;
@@ -80,7 +81,7 @@ public class TriggerActions
 		switch (type)
 		{
 			case "Location":
-				GameLocation? where = null;
+				GameLocation? where = context.TriggerArgs.FirstOfType<GameLocation, object>();
 				if (!Helpers.TryGetLocationArg(args, argNum++, ref where, out error))
 					return false;
 

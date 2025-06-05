@@ -1,4 +1,5 @@
-﻿using EMU.Framework.Attributes;
+﻿using EMU.Framework;
+using EMU.Framework.Attributes;
 using HarmonyLib;
 using StardewValley;
 using StardewValley.GameData.Locations;
@@ -13,30 +14,15 @@ internal class PlayerInstancedLocations
 {
 	const string FLAG = "EMU_PlayerInstanced";
 
-	public PlayerInstancedLocations(Harmony harmony)
+	public PlayerInstancedLocations(HarmonyHelper harmony)
 	{
-		harmony.Patch(
-			typeof(Game1).GetMethod(nameof(Game1.AddLocations)),
-			postfix: new(typeof(PlayerInstancedLocations), nameof(AddInstancedLocations))
-		);
-		harmony.Patch(
-			typeof(Client).GetMethod("setUpGame", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic),
-			postfix: new(typeof(PlayerInstancedLocations), nameof(AddInstancedLocations))
-		);
-
-		var warpPatch = new HarmonyMethod(typeof(PlayerInstancedLocations), nameof(ModifyWarpTarget));
-
-		foreach (var method in typeof(Game1).GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly))
-		{
-			if (method.Name is nameof(Game1.warpFarmer))
-			{
-				var param = method.GetParameters();
-				if (param.Length > 0 && param[0].ParameterType == typeof(string))
-				{
-					harmony.Patch(method, prefix: warpPatch);
-				}
-			}
-		}
+		harmony
+			.With<Game1>(nameof(Game1.AddLocations)).Postfix(AddInstancedLocations)
+			.WithAll(nameof(Game1.warpFarmer), static (m) => {
+				var par = m.GetParameters();
+				return par.Length > 0 && par[0].ParameterType == typeof(string);
+			}).Prefix(ModifyWarpTarget)
+			.With<Client>("setUpGame").Postfix(AddInstancedLocations);
 	}
 
 	private static bool IsInstanced(LocationData location)

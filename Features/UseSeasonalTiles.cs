@@ -14,11 +14,11 @@ internal class UseSeasonalTiles
 {
 	private static IMonitor Monitor = null!;
 
-	public UseSeasonalTiles(IMonitor monitor, Harmony harmony)
+	public UseSeasonalTiles(IMonitor monitor, HarmonyHelper harmony)
 	{
 		Monitor = monitor;
 
-		harmony.Patcher(monitor)
+		harmony
 			.With<GameLocation>(nameof(GameLocation.updateSeasonalTileSheets)).Transpiler(SkipCheck);
 	}
 

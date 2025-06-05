@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
-using System.Reflection;
 using System.Reflection.Emit;
 
 namespace EMU.Features;
@@ -19,15 +18,13 @@ internal class CustomSteps
 	private static IMonitor Monitor = null!;
 	private static Assets Assets = null!;
 
-	public CustomSteps(Harmony harmony, IMonitor monitor, Assets assets)
+	public CustomSteps(HarmonyHelper harmony, IMonitor monitor, Assets assets)
 	{
 		Monitor = monitor;
 		Assets = assets;
 
-		harmony.Patch(
-			typeof(FarmerSprite).GetMethod("checkForFootstep", ModUtilities.AnyDeclared | BindingFlags.Instance),
-			transpiler: new(typeof(CustomSteps), nameof(FootstepPatch))
-		);
+		harmony
+			.With<FarmerSprite>("checkForFootstep").Transpiler(FootstepPatch);
 	}
 
 	private static IEnumerable<CodeInstruction>? FootstepPatch(IEnumerable<CodeInstruction> source, ILGenerator gen)
