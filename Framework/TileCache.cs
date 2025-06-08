@@ -86,7 +86,7 @@ public abstract class TileCache
 		{
 			if (names.Contains(g.mapPath.Value))
 				foreach (var cache in caches)
-					cache.Clear(g);
+					cache.UpdateAll(g);
 
 			return true;
 		});

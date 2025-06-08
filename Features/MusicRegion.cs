@@ -102,7 +102,7 @@ internal class MusicRegion
 		if (where is null)
 			return null;
 
-		var regions = Regions.Get(where);
+		var regions = Regions.Get(where, out _);
 		var pos = who.TilePoint;
 
 		for (int i = 0; i < regions.Count; i++)

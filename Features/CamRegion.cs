@@ -53,7 +53,7 @@ internal class CamRegion
 			return;
 
 		Point tileCenter = new(centerPoint.X / 64, centerPoint.Y / 64);
-		foreach (var region in regions.Get(where))
+		foreach (var region in regions.Get(where, out _))
 			if (region.Contains(tileCenter))
 			{
 				centerPoint.X = Game1.viewport.Width >= region.Width ? region.X + region.Width / 2 :

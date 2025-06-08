@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace EMU.Framework;
 
+// TODO call update event
 public abstract class PropertyCache
 {
 	public string PropertyName { get; init; }
@@ -29,7 +30,7 @@ public class PropertyCache<T> : PropertyCache where T : class
 		Factory = factory;
 	}
 
-	public T Get(GameLocation location)
+	public T Get(GameLocation location, out bool changed)
 	{
 		var p = location.getMapProperty(PropertyName);
 
@@ -37,12 +38,14 @@ public class PropertyCache<T> : PropertyCache where T : class
 		{
 			if (item.propValue == p)
 			{
+				changed = false;
 				return item.Value;
 			}
 		}
 
 		T val = Factory(location, p);
 		cache.AddOrUpdate(location, new(p, val));
+		changed = true;
 		return val;
 	}
 }
