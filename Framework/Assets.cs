@@ -74,9 +74,9 @@ internal class Assets : INotifyPropertyChanged
 			e.LoadFrom(static () => new Dictionary<string, ExtendedLocationData>(), AssetLoadPriority.Low);
 	}
 
-	private void SetAndNotify<T>(ref T field, T value, [CallerMemberName]string? name = null)
+	private void SetAndNotify<T>(ref T? field, T value, [CallerMemberName]string? name = null) where T : class
 	{
-		if (name is null)
+		if (name is null || field == value)
 			return;
 
 		field = value;
