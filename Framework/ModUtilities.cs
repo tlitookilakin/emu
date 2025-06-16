@@ -77,4 +77,10 @@ public static class ModUtilities
 	{
 		return items.FirstOrDefault(static i => i is TO) as TO;
 	}
+
+	public static double SmoothStep(double fromA, double toA, double fromB, double toB, double A)
+	{
+		double sizeA = toA - fromA;
+		return Math.Clamp(A - fromA, 0, sizeA) * (toB - fromB) / sizeA + fromB;
+	}
 }

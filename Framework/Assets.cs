@@ -1,25 +1,35 @@
 ﻿using EMU.Data;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using static EMU.ModEntry;
 
 namespace EMU.Framework;
 
-internal class Assets
+internal class Assets : INotifyPropertyChanged
 {
 	const string SPRITE_DATA = MOD_ID + "/Sprites";
 	const string EXTENDED_DATA = MOD_ID + "/ExtendedLocationData";
 
 	public Dictionary<string, TemporarySpriteData> TempSprites
-		=> tempSprites ??= content.Load<Dictionary<string, TemporarySpriteData>>(SPRITE_DATA);
+	{ 
+		get => tempSprites ??= content.Load<Dictionary<string, TemporarySpriteData>>(SPRITE_DATA);
+		private set => SetAndNotify(ref tempSprites, value);
+	}
 	private Dictionary<string, TemporarySpriteData>? tempSprites;
 
 	public Dictionary<string, ExtendedLocationData> ExtendedData
-		=> extendedData ??= content.Load<Dictionary<string, ExtendedLocationData>>(EXTENDED_DATA);
+	{
+		get => extendedData ??= content.Load<Dictionary<string, ExtendedLocationData>>(EXTENDED_DATA);
+		private set => SetAndNotify(ref extendedData, value);
+	}
 	private Dictionary<string, ExtendedLocationData>? extendedData;
 
-	private IGameContentHelper content;
-	private IMonitor monitor;
+	private readonly IGameContentHelper content;
+	private readonly IMonitor monitor;
+
+	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public bool TryLoad<T>(string name, out T asset, bool showError = true) where T : notnull
 	{
@@ -50,9 +60,9 @@ internal class Assets
 		foreach (var name in e.NamesWithoutLocale)
 		{
 			if (name.IsEquivalentTo(SPRITE_DATA))
-				tempSprites = null;
+				TempSprites = null!;
 			else if (name.IsEquivalentTo(EXTENDED_DATA))
-				extendedData = null;
+				ExtendedData = null!;
 		}
 	}
 
@@ -62,5 +72,14 @@ internal class Assets
 			e.LoadFromModFile<Dictionary<string, TemporarySpriteData>>("assets/sprites.json", AssetLoadPriority.Low);
 		else if (e.NameWithoutLocale.IsEquivalentTo(EXTENDED_DATA))
 			e.LoadFrom(static () => new Dictionary<string, ExtendedLocationData>(), AssetLoadPriority.Low);
+	}
+
+	private void SetAndNotify<T>(ref T field, T value, [CallerMemberName]string? name = null)
+	{
+		if (name is null)
+			return;
+
+		field = value;
+		PropertyChanged?.Invoke(this, new(name));
 	}
 }
